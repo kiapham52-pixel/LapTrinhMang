@@ -1,0 +1,2 @@
+# Built-in Tkinter is used for the desktop UI. CustomTkinter is optional and can be installed separately.
+# customtkinter>=5.2.2

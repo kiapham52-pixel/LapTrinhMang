@@ -1,0 +1,17 @@
+# Python virtual environments and bytecode
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Local SQLite runtime data
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
