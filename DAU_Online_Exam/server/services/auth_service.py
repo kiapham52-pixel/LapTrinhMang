@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import sys
+from datetime import datetime
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -23,6 +24,18 @@ class AuthService:
                 return {'status': 'error', 'success': False, 'message': 'Sai tài khoản hoặc mật khẩu'}
             if user['status'] != 'active':
                 return {'status': 'error', 'success': False, 'message': 'Tài khoản đã bị khóa'}
+
+            now = datetime.now().isoformat()
+            conn.execute("""
+                INSERT INTO sessions (user_id, socket_session, last_seen, status, created_at)
+                VALUES (?, ?, ?, 'ONLINE', ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    socket_session = excluded.socket_session,
+                    last_seen = excluded.last_seen,
+                    status = 'ONLINE'
+            """, (user['id'], f'socket:{user["id"]}:{now}', now, now))
+            conn.commit()
+
             return {
                 'status': 'success',
                 'success': True,
@@ -38,6 +51,46 @@ class AuthService:
                     'status': user['status'],
                 }
             }
+        except Exception as exc:
+            return {'status': 'error', 'success': False, 'message': str(exc)}
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    def heartbeat(self, payload):
+        try:
+            conn = self.db.connect()
+            user_id = payload.get('user_id')
+            if not user_id:
+                return {'status': 'error', 'success': False, 'message': 'Thiếu user_id'}
+            now = datetime.now().isoformat()
+            conn.execute("""
+                INSERT INTO sessions (user_id, socket_session, last_seen, status, created_at)
+                VALUES (?, ?, ?, 'ONLINE', ?)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    last_seen = excluded.last_seen,
+                    status = 'ONLINE'
+            """, (user_id, f'socket:{user_id}:{now}', now, now))
+            conn.commit()
+            return {'status': 'success', 'success': True, 'message': 'Heartbeat OK'}
+        except Exception as exc:
+            return {'status': 'error', 'success': False, 'message': str(exc)}
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    def logout(self, payload):
+        try:
+            conn = self.db.connect()
+            user_id = payload.get('user_id')
+            if user_id:
+                conn.execute("UPDATE sessions SET status = 'OFFLINE', last_seen = ? WHERE user_id = ?", (datetime.now().isoformat(), user_id))
+                conn.commit()
+            return {'status': 'success', 'success': True, 'message': 'Đăng xuất thành công'}
         except Exception as exc:
             return {'status': 'error', 'success': False, 'message': str(exc)}
         finally:
@@ -66,8 +119,15 @@ class AuthService:
             conn = self.db.connect()
             if payload and payload.get('role') != 'admin':
                 return {'status': 'error', 'success': False, 'message': 'Không có quyền'}
-            rows = conn.execute("SELECT * FROM users ORDER BY id").fetchall()
-            return {'status': 'success', 'success': True, 'students': [dict(r) for r in rows]}
+            rows = conn.execute("""
+                SELECT u.*, COALESCE(s.status, 'OFFLINE') AS online_status,
+                       COALESCE(s.last_seen, '') AS last_seen
+                FROM users u
+                LEFT JOIN sessions s ON s.user_id = u.id
+                ORDER BY u.id
+            """).fetchall()
+            students = [dict(r) for r in rows]
+            return {'status': 'success', 'success': True, 'students': students}
         except Exception as exc:
             return {'status': 'error', 'success': False, 'message': str(exc)}
         finally:
@@ -85,12 +145,15 @@ class AuthService:
             if not keyword:
                 return self.get_students(payload)
             query = """
-                SELECT * FROM users
-                WHERE LOWER(student_code) LIKE ?
-                   OR LOWER(full_name) LIKE ?
-                   OR LOWER(username) LIKE ?
-                   OR LOWER(class_name) LIKE ?
-                ORDER BY id
+                SELECT u.*, COALESCE(s.status, 'OFFLINE') AS online_status,
+                       COALESCE(s.last_seen, '') AS last_seen
+                FROM users u
+                LEFT JOIN sessions s ON s.user_id = u.id
+                WHERE LOWER(u.student_code) LIKE ?
+                   OR LOWER(u.full_name) LIKE ?
+                   OR LOWER(u.username) LIKE ?
+                   OR LOWER(u.class_name) LIKE ?
+                ORDER BY u.id
             """
             pattern = f'%{keyword.lower()}%'
             rows = conn.execute(query, (pattern, pattern, pattern, pattern)).fetchall()

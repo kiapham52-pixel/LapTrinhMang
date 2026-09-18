@@ -46,6 +46,15 @@ class DatabaseManager:
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );
 
+                CREATE TABLE IF NOT EXISTS subjects (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    code TEXT UNIQUE NOT NULL,
+                    name TEXT UNIQUE NOT NULL,
+                    description TEXT,
+                    status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','inactive')),
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+
                 CREATE TABLE IF NOT EXISTS exams (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT NOT NULL,
@@ -74,6 +83,7 @@ class DatabaseManager:
                     duration INTEGER NOT NULL DEFAULT 0,
                     started_at TEXT NOT NULL,
                     submitted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    submission_token TEXT,
                     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
                     FOREIGN KEY(exam_id) REFERENCES exams(id) ON DELETE CASCADE
                 );
@@ -88,7 +98,69 @@ class DatabaseManager:
                     FOREIGN KEY(attempt_id) REFERENCES attempts(id) ON DELETE CASCADE,
                     FOREIGN KEY(question_id) REFERENCES questions(id) ON DELETE CASCADE
                 );
+
+                CREATE TABLE IF NOT EXISTS exam_rooms (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    room_code TEXT UNIQUE NOT NULL,
+                    name TEXT NOT NULL,
+                    exam_id INTEGER NOT NULL,
+                    subject TEXT NOT NULL,
+                    duration INTEGER NOT NULL DEFAULT 60,
+                    start_time TEXT,
+                    end_time TEXT,
+                    status TEXT NOT NULL DEFAULT 'DRAFT' CHECK(status IN ('DRAFT','WAITING','RUNNING','FINISHED','CANCELLED')),
+                    password TEXT,
+                    auto_submit INTEGER NOT NULL DEFAULT 1,
+                    shuffle_questions INTEGER NOT NULL DEFAULT 0,
+                    shuffle_answers INTEGER NOT NULL DEFAULT 0,
+                    max_attempts INTEGER NOT NULL DEFAULT 1,
+                    allow_join INTEGER NOT NULL DEFAULT 1,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(exam_id) REFERENCES exams(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS room_students (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    room_id INTEGER NOT NULL,
+                    user_id INTEGER NOT NULL,
+                    joined_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    started_at TEXT,
+                    submitted_at TEXT,
+                    status TEXT NOT NULL DEFAULT 'JOINED',
+                    FOREIGN KEY(room_id) REFERENCES exam_rooms(id) ON DELETE CASCADE,
+                    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL UNIQUE,
+                    socket_session TEXT,
+                    last_seen TEXT,
+                    status TEXT NOT NULL DEFAULT 'OFFLINE' CHECK(status IN ('ONLINE','OFFLINE')),
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                );
             ''')
+            attempt_columns = {row['name'] for row in conn.execute('PRAGMA table_info(attempts)').fetchall()}
+            exam_columns = {row['name'] for row in conn.execute('PRAGMA table_info(exams)').fetchall()}
+            if 'subject' not in exam_columns:
+                conn.execute("ALTER TABLE exams ADD COLUMN subject TEXT NOT NULL DEFAULT ''")
+            if 'submission_token' not in attempt_columns:
+                conn.execute('ALTER TABLE attempts ADD COLUMN submission_token TEXT')
+            conn.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_attempts_submission_token ON attempts(submission_token) WHERE submission_token IS NOT NULL')
+            legacy_subjects = conn.execute('SELECT DISTINCT subject FROM questions WHERE TRIM(subject) <> ""').fetchall()
+            for row in legacy_subjects:
+                subject_name = row['subject'].strip()
+                subject_code = ''.join(part[0] for part in subject_name.split() if part)[:8].upper() or 'MON'
+                candidate = subject_code
+                suffix = 1
+                while conn.execute('SELECT 1 FROM subjects WHERE code = ?', (candidate,)).fetchone():
+                    existing = conn.execute('SELECT name FROM subjects WHERE code = ?', (candidate,)).fetchone()
+                    if existing and existing['name'] == subject_name:
+                        break
+                    suffix += 1
+                    candidate = f'{subject_code[:6]}{suffix}'
+                conn.execute('INSERT OR IGNORE INTO subjects (code, name) VALUES (?, ?)', (candidate, subject_name))
             conn.commit()
         finally:
             conn.close()
@@ -159,6 +231,20 @@ class DatabaseManager:
                 questions2 = conn.execute("SELECT id FROM questions ORDER BY id LIMIT 20").fetchall()
                 for row in questions2:
                     conn.execute("INSERT INTO exam_questions (exam_id, question_id) VALUES (?, ?)", (exam2_id, row['id']))
+
+            legacy_subjects = conn.execute('SELECT DISTINCT subject FROM questions WHERE TRIM(subject) <> ""').fetchall()
+            for row in legacy_subjects:
+                subject_name = row['subject'].strip()
+                subject_code = ''.join(part[0] for part in subject_name.split() if part)[:8].upper() or 'MON'
+                candidate = subject_code
+                suffix = 1
+                while conn.execute('SELECT 1 FROM subjects WHERE code = ?', (candidate,)).fetchone():
+                    existing = conn.execute('SELECT name FROM subjects WHERE code = ?', (candidate,)).fetchone()
+                    if existing and existing['name'] == subject_name:
+                        break
+                    suffix += 1
+                    candidate = f'{subject_code[:6]}{suffix}'
+                conn.execute('INSERT OR IGNORE INTO subjects (code, name) VALUES (?, ?)', (candidate, subject_name))
 
             conn.commit()
         finally:

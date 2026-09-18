@@ -2,6 +2,7 @@ import socket
 import json
 import os
 import sys
+import threading
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -13,6 +14,7 @@ class SocketClient:
         self.host = host
         self.port = port
         self.sock = None
+        self.request_lock = threading.Lock()
 
     def connect(self):
         try:
@@ -24,18 +26,21 @@ class SocketClient:
             return False
 
     def send_request(self, payload):
-        try:
-            if not self.sock:
-                return {'status': 'error', 'message': 'Chưa kết nối server'}
-            send_json(self.sock, payload)
-            response = recv_json(self.sock)
-            return response
-        except Exception as exc:
-            return {'status': 'error', 'message': str(exc)}
+        with self.request_lock:
+            try:
+                if not self.sock:
+                    return {'status': 'error', 'message': 'Chưa kết nối server'}
+                send_json(self.sock, payload)
+                response = recv_json(self.sock)
+                if response is None:
+                    return {'status': 'error', 'message': 'Server đã đóng kết nối'}
+                return response
+            except Exception as exc:
+                return {'status': 'error', 'message': str(exc)}
 
     def close(self):
         try:
             if self.sock:
                 self.sock.close()
         except Exception:
-            pass
+            self.sock = None

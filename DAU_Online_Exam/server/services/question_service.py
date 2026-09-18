@@ -25,7 +25,11 @@ class QuestionService:
                     ORDER BY q.id
                 ''', (exam_id,)).fetchall()
             else:
-                rows = conn.execute('SELECT * FROM questions ORDER BY id').fetchall()
+                rows = conn.execute('''
+                    SELECT q.*, COUNT(DISTINCT eq.exam_id) AS exam_count
+                    FROM questions q LEFT JOIN exam_questions eq ON eq.question_id = q.id
+                    GROUP BY q.id ORDER BY q.id
+                ''').fetchall()
 
             questions = [dict(r) for r in rows]
             return {'status': 'success', 'success': True, 'questions': questions}
@@ -48,10 +52,12 @@ class QuestionService:
                 return self.get_questions(None, payload)
 
             rows = conn.execute("""
-                SELECT * FROM questions
+                SELECT q.*, COUNT(DISTINCT eq.exam_id) AS exam_count
+                FROM questions q LEFT JOIN exam_questions eq ON eq.question_id = q.id
                 WHERE LOWER(content) LIKE ?
                    OR LOWER(subject) LIKE ?
                    OR LOWER(difficulty) LIKE ?
+                GROUP BY q.id
                 ORDER BY id
             """, (f'%{keyword}%', f'%{keyword}%', f'%{keyword}%')).fetchall()
             return {'status': 'success', 'success': True, 'questions': [dict(r) for r in rows]}

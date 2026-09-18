@@ -2,6 +2,7 @@ import socket
 import threading
 import os
 import sys
+import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -11,6 +12,7 @@ from database.database import DatabaseManager
 
 
 def run_server():
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
     db = DatabaseManager(DB_PATH)
     db.init_db()
     db.seed_data()

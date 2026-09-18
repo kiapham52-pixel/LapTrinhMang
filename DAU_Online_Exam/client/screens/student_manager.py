@@ -1,17 +1,18 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
+from client.screens.admin_ui import module_header, toolbar, primary_button, secondary_button, panel, configure_tree
 
 
-class StudentManagementWindow(tk.Toplevel):
-    def __init__(self, app):
-        super().__init__(app)
-        self.app = app
-        self.current_user = app.current_user or {}
-        self.client = app.client
-        self.title('Quản lý sinh viên')
-        self.geometry('1100x680')
+class StudentManagementWindow(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent, bg='#eef3f6')
+        self.root = parent.winfo_toplevel()
+        self.app = self.root
+        self.current_user = getattr(self.root, 'current_user') or {}
+        self.client = getattr(self.root, 'client', None)
         self.configure(bg='#eef3f6')
+        self.pack(fill='both', expand=True)
         self.search_var = tk.StringVar()
         self.student_id_by_code = {}
 
@@ -22,26 +23,27 @@ class StudentManagementWindow(tk.Toplevel):
         self.frame = tk.Frame(self, bg='#eef3f6', padx=20, pady=20)
         self.frame.pack(fill='both', expand=True)
 
-        header = tk.Frame(self.frame, bg='#ffffff', padx=20, pady=16)
-        header.pack(fill='x')
-        tk.Label(header, text='Quản lý sinh viên', font=('Arial', 20, 'bold'), fg='#102a43', bg='#ffffff').pack(anchor='w')
+        module_header(self.frame, '👨‍🎓', 'QUẢN LÝ SINH VIÊN', 'Quản lý tài khoản và thông tin sinh viên.')
 
-        toolbar = tk.Frame(self.frame, bg='#eef3f6', pady=12)
-        toolbar.pack(fill='x')
+        bar = toolbar(self.frame)
 
-        self.search_entry = tk.Entry(toolbar, width=35, font=('Arial', 11))
+        self.search_entry = tk.Entry(bar, width=35, font=('Arial', 11))
         self.search_entry.pack(side='left', padx=(0, 8))
-        tk.Button(toolbar, text='Tìm kiếm', command=self.search_students, width=14, bg='#0d6efd', fg='white').pack(side='left', padx=(0, 8))
-        tk.Button(toolbar, text='Thêm sinh viên', command=self.open_create_form, width=16, bg='#198754', fg='white').pack(side='left', padx=(0, 8))
-        tk.Button(toolbar, text='Sửa', command=self.open_edit_form, width=10, bg='#ffc107', fg='#102a43').pack(side='left', padx=(0, 8))
-        tk.Button(toolbar, text='Xóa', command=self.delete_selected_student, width=10, bg='#dc3545', fg='white').pack(side='left', padx=(0, 8))
-        tk.Button(toolbar, text='Làm mới', command=self.load_students, width=12).pack(side='left', padx=(0, 8))
+        primary_button(bar, '🔍 Tìm sinh viên', self.search_students).pack(side='left')
+        primary_button(bar, '+ Thêm sinh viên', self.open_create_form).pack(side='left', padx=8)
+        secondary_button(bar, 'Sửa', self.open_edit_form).pack(side='left')
+        secondary_button(bar, 'Xóa', self.delete_selected_student).pack(side='left', padx=8)
+        secondary_button(bar, 'Làm mới', self.load_students).pack(side='left')
 
-        table_panel = tk.Frame(self.frame, bg='#ffffff', padx=10, pady=10)
+        self.form_host = tk.Frame(self.frame, bg='#eef3f6')
+        self.form_host.pack(fill='x')
+
+        table_panel = panel(self.frame, 10)
         table_panel.pack(fill='both', expand=True)
 
         cols = ('stt', 'student_code', 'full_name', 'email', 'class_name', 'username', 'role', 'status')
         self.tree = ttk.Treeview(table_panel, columns=cols, show='headings', height=22)
+        configure_tree(self.tree)
         self.tree.heading('stt', text='STT')
         self.tree.heading('student_code', text='Mã sinh viên')
         self.tree.heading('full_name', text='Họ và tên')
@@ -67,6 +69,9 @@ class StudentManagementWindow(tk.Toplevel):
         self.tree.pack(side='left', fill='both', expand=True)
         y_scroll.pack(side='right', fill='y')
         x_scroll.pack(side='bottom', fill='x')
+        self.tree.bind('<MouseWheel>', lambda event: self.tree.yview_scroll(-int(event.delta / 120), 'units'))
+        self.tree.bind('<Prior>', lambda _event: self.tree.yview_scroll(-1, 'pages'))
+        self.tree.bind('<Next>', lambda _event: self.tree.yview_scroll(1, 'pages'))
 
     def load_students(self):
         self.start_worker({'action': 'get_students', 'role': self.current_user.get('role'), 'user_id': self.current_user.get('id')}, self.render_students)
@@ -83,9 +88,9 @@ class StudentManagementWindow(tk.Toplevel):
     def request_worker(self, payload, callback):
         try:
             response = self.client.send_request(payload)
-            self.app.after(0, lambda: callback(response))
+            self.root.after(0, lambda: callback(response))
         except Exception as exc:
-            self.app.after(0, lambda: messagebox.showerror('Lỗi mạng', str(exc)))
+            self.root.after(0, lambda: messagebox.showerror('Lỗi mạng', str(exc)))
 
     def render_students(self, response):
         if response.get('success') is not True and response.get('status') != 'success':
@@ -115,9 +120,8 @@ class StudentManagementWindow(tk.Toplevel):
             self.tree.insert('', 'end', values=values)
 
     def open_create_form(self):
-        form = StudentFormDialog(self, 'create', None)
-        self.wait_window(form)
-        self.load_students()
+        self._clear_form_panel()
+        StudentFormFrame(self.form_host, self, 'create', None)
 
     def open_edit_form(self):
         selected = self.tree.selection()
@@ -127,9 +131,13 @@ class StudentManagementWindow(tk.Toplevel):
         values = self.tree.item(selected[0], 'values')
         student_code = values[1]
         student_id = self.student_id_by_code.get(student_code)
-        form = StudentFormDialog(self, 'edit', None, student_code=values[1], full_name=values[2], email=values[3], class_name=values[4], username=values[5], role=values[6], status=values[7], student_id=student_id)
-        self.wait_window(form)
-        self.load_students()
+        self._clear_form_panel()
+        StudentFormFrame(self.form_host, self, 'edit', None, student_code=values[1], full_name=values[2], email=values[3], class_name=values[4], username=values[5], role=values[6], status=values[7], student_id=student_id)
+
+    def _clear_form_panel(self):
+        for child in self.frame.winfo_children():
+            if getattr(child, 'name', '') == 'student_form_frame':
+                child.destroy()
 
     def delete_selected_student(self):
         selected = self.tree.selection()
@@ -151,48 +159,45 @@ class StudentManagementWindow(tk.Toplevel):
             messagebox.showerror('Lỗi', response.get('message', 'Không thể xóa sinh viên'))
 
 
-class StudentFormDialog(tk.Toplevel):
-    def __init__(self, parent, mode, student=None, student_id=None, student_code=None, full_name=None, email=None, class_name=None, username=None, role=None, status=None):
-        super().__init__(parent)
+class StudentFormFrame(tk.Frame):
+    def __init__(self, parent, manager, mode, student=None, student_id=None, student_code=None, full_name=None, email=None, class_name=None, username=None, role=None, status=None):
+        super().__init__(parent, bg='#ffffff', padx=20, pady=20)
+        self.name = 'student_form_frame'
         self.parent = parent
+        self.manager = manager
         self.mode = mode
         self.student = student
         self.student_id = student_id
-        self.current_user = parent.current_user
-        self.client = parent.client
-        self.title('Thêm sinh viên' if mode == 'create' else 'Sửa sinh viên')
-        self.geometry('460x560')
-        self.configure(bg='#eef3f6')
+        self.current_user = manager.current_user
+        self.client = manager.client
+        self.pack(fill='x', pady=(12, 0))
 
-        form = tk.Frame(self, bg='#ffffff', padx=20, pady=20)
-        form.pack(fill='both', expand=True)
-
-        tk.Label(form, text='Mã sinh viên', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=0, column=0, sticky='w', padx=5, pady=8)
-        self.student_code = tk.Entry(form, width=30)
+        tk.Label(self, text='Mã sinh viên', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=0, column=0, sticky='w', padx=5, pady=8)
+        self.student_code = tk.Entry(self, width=30)
         self.student_code.grid(row=0, column=1, padx=5, pady=8)
 
-        tk.Label(form, text='Họ tên', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=1, column=0, sticky='w', padx=5, pady=8)
-        self.full_name = tk.Entry(form, width=30)
+        tk.Label(self, text='Họ tên', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=1, column=0, sticky='w', padx=5, pady=8)
+        self.full_name = tk.Entry(self, width=30)
         self.full_name.grid(row=1, column=1, padx=5, pady=8)
 
-        tk.Label(form, text='Email', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=2, column=0, sticky='w', padx=5, pady=8)
-        self.email = tk.Entry(form, width=30)
+        tk.Label(self, text='Email', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=2, column=0, sticky='w', padx=5, pady=8)
+        self.email = tk.Entry(self, width=30)
         self.email.grid(row=2, column=1, padx=5, pady=8)
 
-        tk.Label(form, text='Lớp', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=3, column=0, sticky='w', padx=5, pady=8)
-        self.class_name = tk.Entry(form, width=30)
+        tk.Label(self, text='Lớp', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=3, column=0, sticky='w', padx=5, pady=8)
+        self.class_name = tk.Entry(self, width=30)
         self.class_name.grid(row=3, column=1, padx=5, pady=8)
 
-        tk.Label(form, text='Username', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=4, column=0, sticky='w', padx=5, pady=8)
-        self.username = tk.Entry(form, width=30)
+        tk.Label(self, text='Username', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=4, column=0, sticky='w', padx=5, pady=8)
+        self.username = tk.Entry(self, width=30)
         self.username.grid(row=4, column=1, padx=5, pady=8)
 
-        tk.Label(form, text='Password', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=5, column=0, sticky='w', padx=5, pady=8)
-        self.password = tk.Entry(form, width=30, show='*')
+        tk.Label(self, text='Password', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=5, column=0, sticky='w', padx=5, pady=8)
+        self.password = tk.Entry(self, width=30, show='*')
         self.password.grid(row=5, column=1, padx=5, pady=8)
 
-        tk.Label(form, text='Trạng thái', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=6, column=0, sticky='w', padx=5, pady=8)
-        self.status = ttk.Combobox(form, values=['active', 'inactive'], state='readonly', width=28)
+        tk.Label(self, text='Trạng thái', font=('Arial', 11, 'bold'), bg='#ffffff').grid(row=6, column=0, sticky='w', padx=5, pady=8)
+        self.status = ttk.Combobox(self, values=['active', 'inactive'], state='readonly', width=28)
         self.status.grid(row=6, column=1, padx=5, pady=8)
         self.status.set(status or 'active')
 
@@ -203,9 +208,8 @@ class StudentFormDialog(tk.Toplevel):
             self.class_name.insert(0, class_name or '')
             self.username.insert(0, username or '')
             self.status.set(status or 'active')
-            # password left blank
 
-        buttons = tk.Frame(form, bg='#ffffff')
+        buttons = tk.Frame(self, bg='#ffffff')
         buttons.grid(row=7, column=0, columnspan=2, pady=20)
         tk.Button(buttons, text='Lưu', command=self.save, width=12, bg='#0d6efd', fg='white').pack(side='left', padx=10)
         tk.Button(buttons, text='Hủy', command=self.destroy, width=12).pack(side='left', padx=10)
@@ -235,6 +239,7 @@ class StudentFormDialog(tk.Toplevel):
         response = self.client.send_request(payload)
         if response.get('success') is True or response.get('status') == 'success':
             messagebox.showinfo('Thành công', response.get('message', 'Thao tác thành công'))
+            self.manager.load_students()
             self.destroy()
         else:
             messagebox.showerror('Lỗi', response.get('message', 'Thao tác thất bại'))

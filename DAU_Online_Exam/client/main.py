@@ -3,25 +3,30 @@ from tkinter import messagebox
 import os
 import sys
 import threading
+import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from client.network.socket_client import SocketClient
 from client.screens.student_manager import StudentManagementWindow
 from client.screens.question_manager import QuestionManagementWindow
-from client.screens.exam_screen import ExamListWindow
+from client.screens.admin_dashboard import AdminDashboardWindow
+from client.screens.student_dashboard import StudentDashboard
 
 
 class ExamClientApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('DAU ONLINE EXAM')
-        self.geometry('960x680')
+        self.attributes('-fullscreen', True)
+        self.resizable(True, True)
         self.configure(bg='#eef3f6')
         self.current_user = None
         self.current_exam = None
         self.client = None
         self.request_lock = threading.Lock()
+        self.heartbeat_thread = None
+        self.heartbeat_stop = threading.Event()
 
         self.build_login_screen()
 
@@ -101,6 +106,7 @@ class ExamClientApp(tk.Tk):
                 user = response.get('user') or {}
                 self.current_user = user
                 self.client = client
+                self.start_heartbeat()
                 self.after(0, self.render_dashboard)
             else:
                 message = response.get('message') or 'Sai tài khoản hoặc mật khẩu'
@@ -122,32 +128,25 @@ class ExamClientApp(tk.Tk):
             return
         self.after(0, self.render_dashboard)
 
+    def is_exam_in_progress(self):
+        return bool(getattr(getattr(self, 'student_dashboard', None), 'exam_state', None) == 'IN_PROGRESS')
+
+    def enter_exam_fullscreen(self):
+        self.attributes('-fullscreen', True)
+        self.resizable(False, False)
+        self.update_idletasks()
+        self.focus_force()
+
     def render_dashboard(self):
         self.clear_all_widgets()
-        self.dashboard = tk.Frame(self, bg='#eef3f6')
-        self.dashboard.pack(fill='both', expand=True)
+        if self.current_user and self.current_user.get('role') == 'admin':
+            self.admin_dashboard = AdminDashboardWindow(self)
+            self.admin_dashboard.pack(fill='both', expand=True)
+            return
 
-        tk.Label(self.dashboard, text=f'Xin chào, {self.current_user.get("full_name")}', font=('Arial', 22, 'bold'), fg='#102a43', bg='#eef3f6').pack(anchor='w', padx=20, pady=10)
-        tk.Label(self.dashboard, text=f'Mã sinh viên: {self.current_user.get("student_code", self.current_user.get("username"))}', font=('Arial', 11), fg='#58758a', bg='#eef3f6').pack(anchor='w', padx=20)
-        tk.Label(self.dashboard, text=f'Vai trò: {"Admin" if self.current_user.get("role") == "admin" else "Sinh viên"}', font=('Arial', 11), fg='#58758a', bg='#eef3f6').pack(anchor='w', padx=20)
-
-        if self.current_user.get('role') == 'admin':
-            admin_card = tk.Frame(self.dashboard, bg='#ffffff', padx=20, pady=20)
-            admin_card.pack(fill='x', padx=20, pady=20)
-            tk.Label(admin_card, text='Admin Dashboard', font=('Arial', 16, 'bold'), fg='#102a43', bg='#ffffff').pack(anchor='w')
-            tk.Button(admin_card, text='Quản lý sinh viên', command=self.open_student_manager, width=22).pack(side='left', padx=5)
-            tk.Button(admin_card, text='Quản lý câu hỏi', command=self.open_question_manager, width=22).pack(side='left', padx=5)
-            tk.Button(admin_card, text='Quản lý kỳ thi', command=self.open_exam_manager, width=22).pack(side='left', padx=5)
-            tk.Button(admin_card, text='Xem kết quả', command=self.show_results, width=22).pack(side='left', padx=5)
-        else:
-            student_card = tk.Frame(self.dashboard, bg='#ffffff', padx=20, pady=20)
-            student_card.pack(fill='x', padx=20, pady=20)
-            tk.Button(student_card, text='📝 Danh sách kỳ thi', command=self.show_exam_list, width=20).pack(side='left', padx=5)
-            tk.Button(student_card, text='📊 Kết quả của tôi', command=self.show_results, width=20).pack(side='left', padx=5)
-            tk.Button(student_card, text='📚 Lịch sử thi', command=self.show_history, width=20).pack(side='left', padx=5)
-            tk.Button(student_card, text='👤 Thông tin cá nhân', command=self.show_profile, width=20).pack(side='left', padx=5)
-
-        tk.Button(self.dashboard, text='🚪 Đăng xuất', command=self.logout, width=20, bg='#d9534f', fg='white').pack(anchor='e', padx=20, pady=20)
+        # New professional student dashboard
+        self.student_dashboard = StudentDashboard(self, self.current_user, self.client)
+        self.student_dashboard.pack(fill='both', expand=True)
 
     def open_student_manager(self):
         if self.client is None:
@@ -162,18 +161,29 @@ class ExamClientApp(tk.Tk):
         QuestionManagementWindow(self)
 
     def open_exam_manager(self):
+        if self.is_exam_in_progress():
+            return
         if self.client is None:
             messagebox.showerror('Lỗi', 'Chưa có kết nối server')
             return
-        ExamListWindow(self)
+        if self.current_user and self.current_user.get('role') == 'admin':
+            self.render_dashboard()
+        else:
+            self.show_exam_list()
 
     def show_exam_list(self):
+        if self.is_exam_in_progress():
+            return
         if self.client is None:
             messagebox.showerror('Lỗi', 'Chưa có kết nối server')
             return
-        ExamListWindow(self)
+        # Do not open a new Toplevel and keep content inside this root application.
+        if self.current_user and self.current_user.get('role') == 'student':
+            self.render_dashboard()
 
     def show_results(self):
+        if self.is_exam_in_progress():
+            return
         if self.client is None:
             messagebox.showerror('Lỗi', 'Chưa có kết nối server')
             return
@@ -206,6 +216,8 @@ class ExamClientApp(tk.Tk):
             messagebox.showerror('Lỗi', response.get('message') or 'Không thể lấy kết quả.')
 
     def show_history(self):
+        if self.is_exam_in_progress():
+            return
         if self.client is None:
             messagebox.showerror('Lỗi', 'Chưa có kết nối server')
             return
@@ -218,15 +230,48 @@ class ExamClientApp(tk.Tk):
             messagebox.showerror('Lỗi', response.get('message'))
 
     def show_profile(self):
+        if self.is_exam_in_progress():
+            return
         user = self.current_user
         messagebox.showinfo('Thông tin cá nhân', f"Mã sinh viên: {user.get('student_code')}\nHọ tên: {user.get('full_name')}\nEmail: {user.get('email', '')}\nLớp: {user.get('class_name', '')}")
 
+    def start_heartbeat(self):
+        self.stop_heartbeat()
+        self.heartbeat_stop = threading.Event()
+        self.heartbeat_thread = threading.Thread(target=self.heartbeat_worker, daemon=True)
+        self.heartbeat_thread.start()
+
+    def stop_heartbeat(self):
+        if getattr(self, 'heartbeat_stop', None) is not None:
+            self.heartbeat_stop.set()
+
+    def heartbeat_worker(self):
+        while True:
+            if self.heartbeat_stop.is_set() or self.client is None or self.current_user is None:
+                break
+            try:
+                payload = {'action': 'heartbeat', 'user_id': self.current_user.get('id')}
+                self.client.send_request(payload)
+            except Exception:
+                pass
+            self.heartbeat_stop.wait(5)
+
     def logout(self):
-        if self.client:
+        if self.is_exam_in_progress():
+            exam_window = getattr(self.student_dashboard, 'exam_window', None)
+            if exam_window is not None:
+                exam_window.submit_exam(reason='logout', source='logout')
+            return
+        if self.client and self.current_user:
+            try:
+                self.client.send_request({'action': 'logout', 'user_id': self.current_user.get('id')})
+            except Exception:
+                pass
             try:
                 self.client.close()
             except Exception:
                 pass
+        self.stop_heartbeat()
         self.current_user = None
         self.client = None
         self.build_login_screen()
