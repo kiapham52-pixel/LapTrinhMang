@@ -1,0 +1,4 @@
+python run_server.py
+python client\main.py
+- output là gì -nhập tên phòng - môn học - lớp - khóa
+		- 
