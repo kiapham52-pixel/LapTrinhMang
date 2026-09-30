@@ -1,6 +1,8 @@
 import os
 import sys
 import tempfile
+import threading
+import tkinter as tk
 import unittest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,6 +13,8 @@ from server.services.result_service import ResultService
 from server.services.question_service import QuestionService
 from server.services.room_service import RoomService
 from server.services.subject_service import SubjectService
+from client.screens.student_manager import StudentManagementWindow
+from client.screens.question_manager import QuestionManagementWindow
 from datetime import datetime, timedelta
 
 
@@ -170,6 +174,34 @@ class ResultServiceSubmitExamTest(unittest.TestCase):
                 os.unlink(db_file)
             except Exception:
                 pass
+
+    def test_admin_form_panels_clear_previous_form_without_stacking(self):
+        class DummyClient:
+            def send_request(self, payload):
+                return {'status': 'success', 'students': [], 'questions': [], 'subjects': []}
+
+        root = tk.Tk()
+        root.withdraw()
+        root.client = DummyClient()
+        root.current_user = {'role': 'admin', 'id': 1}
+        try:
+            student_parent = tk.Frame(root)
+            student_parent.pack()
+            student_window = StudentManagementWindow(student_parent)
+            tk.Label(student_window.form_host, text='student form').pack()
+            self.assertEqual(len(student_window.form_host.winfo_children()), 1)
+            student_window._clear_form_panel()
+            self.assertEqual(len(student_window.form_host.winfo_children()), 0)
+
+            question_parent = tk.Frame(root)
+            question_parent.pack()
+            question_window = QuestionManagementWindow(question_parent)
+            tk.Label(question_window.form_host, text='question form').pack()
+            self.assertEqual(len(question_window.form_host.winfo_children()), 1)
+            question_window._clear_form_panel()
+            self.assertEqual(len(question_window.form_host.winfo_children()), 0)
+        finally:
+            root.destroy()
 
 
 if __name__ == '__main__':

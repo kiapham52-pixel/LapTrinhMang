@@ -26,79 +26,68 @@ class AdminDashboardWindow(tk.Frame):
         self.load_dashboard_data()
 
     def build_ui(self):
-        self.frame = tk.Frame(self, bg='#f5f5f5')
+        self.frame = tk.Frame(self, bg='#edf2f7')
         self.frame.pack(fill='both', expand=True)
 
-        self.sidebar = tk.Frame(self.frame, bg='#7F1D1D', width=240)
+        self.sidebar = tk.Frame(self.frame, bg='#0f172a', width=255)
         self.sidebar.pack(side='left', fill='y')
+        self.sidebar.pack_propagate(False)
 
-        # Sidebar logo
-        logo_frame = tk.Frame(self.sidebar, bg='#7F1D1D', pady=24)
+        logo_frame = tk.Frame(self.sidebar, bg='#0f172a', pady=28)
         logo_frame.pack(fill='x')
-        tk.Label(logo_frame, text='DAU', font=('Arial', 26, 'bold'), fg='#ffffff', bg='#7F1D1D').pack(anchor='center')
-        tk.Label(logo_frame, text='ONLINE EXAM', font=('Arial', 13, 'bold'), fg='#f6d7d7', bg='#7F1D1D').pack(anchor='center')
+        tk.Label(logo_frame, text='DAU', font=('Arial', 32, 'bold'), fg='#ffffff', bg='#0f172a').pack(anchor='center')
+        tk.Label(logo_frame, text='ONLINE EXAM', font=('Arial', 12, 'bold'), fg='#fca5a5', bg='#0f172a').pack(anchor='center', pady=(8, 0))
 
-        menu = tk.Frame(self.sidebar, bg='#7F1D1D')
-        menu.pack(fill='x', pady=16)
+        menu = tk.Frame(self.sidebar, bg='#0f172a')
+        menu.pack(fill='x', pady=18)
 
-        dashboard = tk.Button(menu, text='Dashboard', command=self.show_dashboard_content, bg='#991B1B', fg='#ffffff', font=('Arial', 11, 'bold'), bd=0, anchor='w', padx=20, pady=12)
-        dashboard.pack(fill='x', padx=14, pady=(0, 8))
-        tk.Label(menu, text='QUẢN LÝ THI', bg='#7F1D1D', fg='#f6d7d7', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(12, 8))
+        dashboard = tk.Button(menu, text='Dashboard', command=self.show_dashboard_content, bg='#1d4ed8', fg='#ffffff', font=('Arial', 11, 'bold'), bd=0, anchor='w', padx=20, pady=12)
+        dashboard.pack(fill='x', padx=14, pady=(0, 12))
+
+        tk.Label(menu, text='QUẢN LÝ THI', bg='#0f172a', fg='#cbd5e1', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(8, 8))
         group_items = [
-            ('Môn học', 'subject'),
-            ('Phòng thi', 'room'),
-            ('Giám sát phòng thi', 'monitor'),
-            ('Đề thi', 'exam'),
-            ('Ngân hàng câu hỏi', 'question'),
+            ('Môn học', self.open_subject_manager),
+            ('Phòng thi', self.open_room_manager),
+            ('Giám sát phòng thi', self.open_room_manager),
+            ('Đề thi', self.open_exam_manager),
+            ('Ngân hàng câu hỏi', self.open_question_manager),
         ]
-        for label, key in group_items:
-            cmd = None
-            if key == 'room':
-                cmd = self.open_room_manager
-            elif key == 'subject':
-                cmd = self.open_subject_manager
-            elif key == 'monitor':
-                cmd = self.open_room_manager
-            elif key == 'exam':
-                cmd = self.open_exam_manager
-            elif key == 'question':
-                cmd = self.open_question_manager
-            btn = tk.Button(menu, text=label, bg='#7F1D1D', fg='#ffffff', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=cmd)
+        for label, cmd in group_items:
+            btn = tk.Button(menu, text=label, bg='#0f172a', fg='#e2e8f0', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=cmd)
             btn.pack(fill='x', padx=14)
 
-        tk.Label(menu, text='NGƯỜI DÙNG', bg='#7F1D1D', fg='#f6d7d7', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(16, 8))
-        for label, key in [('Sinh viên', 'student'), ('Trạng thái Online', 'online')]:
-            cmd = self.open_student_manager if key == 'student' else self.open_online_monitor
-            btn = tk.Button(menu, text=label, bg='#7F1D1D', fg='#ffffff', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=cmd)
+        tk.Label(menu, text='NGƯỜI DÙNG', bg='#0f172a', fg='#cbd5e1', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(16, 8))
+        for label, cmd in [('Sinh viên', self.open_student_manager), ('Trạng thái Online', self.open_online_monitor)]:
+            btn = tk.Button(menu, text=label, bg='#0f172a', fg='#e2e8f0', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=cmd)
             btn.pack(fill='x', padx=14)
 
-        tk.Label(menu, text='KẾT QUẢ', bg='#7F1D1D', fg='#f6d7d7', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(16, 8))
-        btn_result = tk.Button(menu, text='Kết quả thi', bg='#7F1D1D', fg='#ffffff', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=self.open_results_manager)
+        tk.Label(menu, text='KẾT QUẢ', bg='#0f172a', fg='#cbd5e1', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(16, 8))
+        btn_result = tk.Button(menu, text='Kết quả thi', bg='#0f172a', fg='#e2e8f0', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=self.open_results_manager)
         btn_result.pack(fill='x', padx=14)
-        btn_stats = tk.Button(menu, text='Thống kê', bg='#7F1D1D', fg='#ffffff', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=self.open_statistics_manager)
+        btn_stats = tk.Button(menu, text='Thống kê', bg='#0f172a', fg='#e2e8f0', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=self.open_statistics_manager)
         btn_stats.pack(fill='x', padx=14)
 
-        tk.Label(menu, text='HỆ THỐNG', bg='#7F1D1D', fg='#f6d7d7', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(16, 8))
-        for label, key in [('Cài đặt', 'settings'), ('Đăng xuất', 'logout')]:
-            btn = tk.Button(menu, text=label, bg='#7F1D1D', fg='#ffffff', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=self.logout if key == 'logout' else None)
+        tk.Label(menu, text='HỆ THỐNG', bg='#0f172a', fg='#cbd5e1', font=('Arial', 10, 'bold'), anchor='w').pack(fill='x', padx=20, pady=(16, 8))
+        for label, cmd in [('Cài đặt', None), ('Đăng xuất', self.logout)]:
+            btn = tk.Button(menu, text=label, bg='#0f172a', fg='#e2e8f0', font=('Arial', 10), bd=0, anchor='w', padx=20, pady=10, command=cmd if cmd is not None else lambda: None)
             btn.pack(fill='x', padx=14)
 
-        content = tk.Frame(self.frame, bg='#f5f5f5')
+        content = tk.Frame(self.frame, bg='#edf2f7')
         content.pack(side='left', fill='both', expand=True)
 
-        topbar = tk.Frame(content, bg='#ffffff', height=60)
+        topbar = tk.Frame(content, bg='#ffffff', height=72)
         topbar.pack(fill='x')
         topbar.pack_propagate(False)
-        tk.Label(topbar, text='DAU ONLINE EXAM', font=('Arial', 18, 'bold'), fg='#7F1D1D', bg='#ffffff').pack(side='left', padx=22, pady=10)
+        tk.Label(topbar, text='Dashboard quản trị', font=('Arial', 18, 'bold'), fg='#0f172a', bg='#ffffff').pack(side='left', padx=24, pady=16)
 
         right = tk.Frame(topbar, bg='#ffffff')
         right.pack(side='right', fill='y', padx=20)
-        tk.Button(right, text='🔔', font=('Arial', 12), bg='#ffffff', fg='#7F1D1D', bd=0).pack(side='left', padx=(0, 14))
-        tk.Label(right, text='Administrator', font=('Arial', 12), fg='#1f2937', bg='#ffffff').pack(side='left', padx=(0, 6))
-        tk.Label(right, text='Admin', font=('Arial', 11), fg='#7F1D1D', bg='#ffffff').pack(side='left', padx=(0, 6))
-        tk.Label(right, text='◉', font=('Arial', 16), fg='#7F1D1D', bg='#ffffff').pack(side='left', padx=(0, 6))
+        tk.Label(right, text='🔔', font=('Arial', 12), bg='#ffffff', fg='#b91c1c').pack(side='left', padx=(0, 12))
+        tk.Label(right, text='Administrator', font=('Arial', 12), fg='#111827', bg='#ffffff').pack(side='left', padx=(0, 6))
+        tk.Label(right, text='Admin', font=('Arial', 11), fg='#b91c1c', bg='#ffffff').pack(side='left', padx=(0, 6))
+        tk.Label(right, text='●', font=('Arial', 16), fg='#16a34a', bg='#ffffff').pack(side='left')
 
-        dashboard_area = tk.Frame(content, bg='#f5f5f5', padx=18, pady=18)
+        dashboard_area = tk.Frame(content, bg='#edf2f7', padx=20, pady=20)
         dashboard_area.pack(fill='both', expand=True)
         self.content_panel = dashboard_area
 
@@ -108,19 +97,19 @@ class AdminDashboardWindow(tk.Frame):
         for child in self.content_panel.winfo_children():
             child.destroy()
 
-        self.dashboard_title = tk.Label(self.content_panel, text='Xin chào, Admin 👋', font=('Arial', 23, 'bold'), fg='#7F1D1D', bg='#f5f5f5')
-        self.dashboard_title.pack(anchor='w', pady=(0, 10))
-        self.dashboard_subtitle = tk.Label(self.content_panel, text='Chào mừng bạn quay lại hệ thống thi trực tuyến DAU.', font=('Arial', 11), fg='#6b7280', bg='#f5f5f5')
-        self.dashboard_subtitle.pack(anchor='w', pady=(0, 12))
+        self.dashboard_title = tk.Label(self.content_panel, text='Xin chào, Admin 👋', font=('Arial', 30, 'bold'), fg='#0f172a', bg='#edf2f7')
+        self.dashboard_title.pack(anchor='w', pady=(0, 6))
+        self.dashboard_subtitle = tk.Label(self.content_panel, text='Chào mừng bạn quay lại hệ thống thi trực tuyến DAU.', font=('Arial', 11), fg='#64748b', bg='#edf2f7')
+        self.dashboard_subtitle.pack(anchor='w', pady=(0, 16))
 
-        self.cards = tk.Frame(self.content_panel, bg='#f5f5f5')
-        self.cards.pack(fill='x')
+        self.cards = tk.Frame(self.content_panel, bg='#edf2f7')
+        self.cards.pack(fill='x', pady=(0, 18))
 
-        self.activity_frame = tk.Frame(self.content_panel, bg='#ffffff', padx=14, pady=14)
-        self.activity_frame.pack(fill='x', pady=(18, 0))
-        tk.Label(self.activity_frame, text='KỲ THI ĐANG HOẠT ĐỘNG', font=('Arial', 14, 'bold'), bg='#ffffff', fg='#1f2937').pack(anchor='w')
+        self.activity_frame = tk.Frame(self.content_panel, bg='#ffffff', padx=18, pady=18, highlightbackground='#e2e8f0', highlightthickness=1)
+        self.activity_frame.pack(fill='x', pady=(0, 0))
+        tk.Label(self.activity_frame, text='KỲ THI ĐANG HOẠT ĐỘNG', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
         self.activity_body = tk.Frame(self.activity_frame, bg='#ffffff')
-        self.activity_body.pack(fill='x', pady=(10, 0))
+        self.activity_body.pack(fill='x', pady=(12, 0))
         if load_data:
             self.load_dashboard_data()
 
@@ -146,24 +135,24 @@ class AdminDashboardWindow(tk.Frame):
         for child in self.cards.winfo_children():
             child.destroy()
         data = [
-            ('👨‍🎓', 'Sinh viên', stats.get('total_students', 0)),
-            ('🟢', 'Online', stats.get('online_students', 0)),
-            ('🚪', 'Phòng thi', stats.get('total_rooms', 0)),
-            ('📝', 'Kỳ thi', stats.get('total_exams', 0)),
-            ('📚', 'Môn học', stats.get('total_subjects', 0)),
-            ('❓', 'Câu hỏi', stats.get('total_questions', 0)),
-            ('📊', 'Bài đã nộp', stats.get('total_attempts', 0)),
-            ('⏱', 'Đang thi', stats.get('active_attempts', 0)),
-            ('⭐', 'Điểm TB', stats.get('average_score', 0)),
+            ('👨‍🎓', 'Sinh viên', stats.get('total_students', 0), '#2563eb'),
+            ('🟢', 'Online', stats.get('online_students', 0), '#16a34a'),
+            ('🚪', 'Phòng thi', stats.get('total_rooms', 0), '#8b5cf6'),
+            ('📝', 'Kỳ thi', stats.get('total_exams', 0), '#f59e0b'),
+            ('📚', 'Môn học', stats.get('total_subjects', 0), '#ec4899'),
+            ('❓', 'Câu hỏi', stats.get('total_questions', 0), '#b91c1c'),
+            ('📊', 'Bài đã nộp', stats.get('total_attempts', 0), '#0ea5e9'),
+            ('⏱', 'Đang thi', stats.get('active_attempts', 0), '#14b8a6'),
+            ('⭐', 'Điểm TB', stats.get('average_score', 0), '#f97316'),
         ]
-        for i, (icon, label, value) in enumerate(data):
+        for i, (icon, label, value, color) in enumerate(data):
             row = i // 4
             col = i % 4
-            card = tk.Frame(self.cards, bg='#ffffff', padx=18, pady=16, highlightbackground='#e5e7eb', highlightthickness=1)
+            card = tk.Frame(self.cards, bg='#ffffff', padx=18, pady=16, highlightbackground='#e2e8f0', highlightthickness=1)
             card.grid(row=row, column=col, padx=8, pady=8, sticky='nsew')
-            tk.Label(card, text=icon, font=('Arial', 16), bg='#ffffff', fg='#7F1D1D').pack(anchor='w')
-            tk.Label(card, text=str(value), font=('Arial', 22, 'bold'), bg='#ffffff', fg='#1f2937').pack(anchor='w')
-            tk.Label(card, text=label, font=('Arial', 10), bg='#ffffff', fg='#6b7280').pack(anchor='w')
+            tk.Label(card, text=icon, font=('Arial', 16), bg='#ffffff', fg=color).pack(anchor='w')
+            tk.Label(card, text=str(value), font=('Arial', 22, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
+            tk.Label(card, text=label, font=('Arial', 10), bg='#ffffff', fg='#64748b').pack(anchor='w')
 
     def render_activity(self, rooms):
         for child in self.activity_body.winfo_children():

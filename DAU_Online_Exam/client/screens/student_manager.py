@@ -135,9 +135,8 @@ class StudentManagementWindow(tk.Frame):
         StudentFormFrame(self.form_host, self, 'edit', None, student_code=values[1], full_name=values[2], email=values[3], class_name=values[4], username=values[5], role=values[6], status=values[7], student_id=student_id)
 
     def _clear_form_panel(self):
-        for child in self.frame.winfo_children():
-            if getattr(child, 'name', '') == 'student_form_frame':
-                child.destroy()
+        for child in self.form_host.winfo_children():
+            child.destroy()
 
     def delete_selected_student(self):
         selected = self.tree.selection()

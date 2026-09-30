@@ -32,40 +32,57 @@ class ExamClientApp(tk.Tk):
 
     def build_login_screen(self):
         self.clear_all_widgets()
-        self.login_frame = tk.Frame(self, bg='#eef3f6')
+        self.login_frame = tk.Frame(self, bg='#0f172a')
         self.login_frame.pack(fill='both', expand=True)
 
-        panel = tk.Frame(self.login_frame, bg='#ffffff', padx=30, pady=30)
-        panel.pack(padx=70, pady=50, ipadx=30, ipady=30)
+        left_panel = tk.Frame(self.login_frame, bg='#111827', padx=54, pady=54)
+        left_panel.pack(side='left', fill='y', ipadx=24)
+        left_panel.pack_propagate(False)
 
-        title = tk.Label(panel, text='DAU ONLINE EXAM', font=('Arial', 26, 'bold'), fg='#102a43', bg='#ffffff')
-        title.pack(pady=(0, 8))
+        brand = tk.Label(left_panel, text='DAU', font=('Arial', 42, 'bold'), fg='#ffffff', bg='#111827')
+        brand.pack(anchor='w', pady=(10, 0))
+        tk.Label(left_panel, text='ONLINE EXAM', font=('Arial', 14, 'bold'), fg='#fca5a5', bg='#111827').pack(anchor='w', pady=(6, 28))
 
-        subtitle = tk.Label(panel, text='Hệ thống thi trắc nghiệm trực tuyến', font=('Arial', 12), fg='#58758a', bg='#ffffff')
-        subtitle.pack(pady=(0, 25))
+        tk.Label(left_panel, text='Hệ thống thi trắc nghiệm hiện đại', font=('Arial', 18, 'bold'), fg='#ffffff', bg='#111827').pack(anchor='w')
+        tk.Label(left_panel, text='Quản lý kỳ thi, giám sát phòng thi, theo dõi thống kê', font=('Arial', 11), fg='#cbd5e1', bg='#111827', justify='left', wraplength=360).pack(anchor='w', pady=(14, 26))
 
-        tk.Label(panel, text='Username / Mã sinh viên', font=('Arial', 10, 'bold'), fg='#102a43', bg='#ffffff').pack(anchor='w')
-        self.username_entry = tk.Entry(panel, width=40, font=('Arial', 12), bd=1)
-        self.username_entry.pack(fill='x', pady=(5, 12))
+        feature_box = tk.Frame(left_panel, bg='#1f2937', padx=18, pady=18)
+        feature_box.pack(fill='x', pady=(8, 10))
+        tk.Label(feature_box, text='• Tối ưu trải nghiệm làm bài', font=('Arial', 11), bg='#1f2937', fg='#e2e8f0').pack(anchor='w', pady=4)
+        tk.Label(feature_box, text='• Theo dõi tiến độ và kết quả real-time', font=('Arial', 11), bg='#1f2937', fg='#e2e8f0').pack(anchor='w', pady=4)
+        tk.Label(feature_box, text='• Quản trị và thống kê chuyên nghiệp', font=('Arial', 11), bg='#1f2937', fg='#e2e8f0').pack(anchor='w', pady=4)
 
-        tk.Label(panel, text='Password', font=('Arial', 10, 'bold'), fg='#102a43', bg='#ffffff').pack(anchor='w')
-        self.password_frame = tk.Frame(panel, bg='#ffffff')
-        self.password_frame.pack(fill='x', pady=(5, 12))
-        self.password_entry = tk.Entry(self.password_frame, width=34, font=('Arial', 12), show='*', bd=1)
+        right_panel = tk.Frame(self.login_frame, bg='#f8fafc', padx=56, pady=48)
+        right_panel.pack(side='left', fill='both', expand=True)
+
+        card = tk.Frame(right_panel, bg='#ffffff', padx=34, pady=34, highlightbackground='#e2e8f0', highlightthickness=1)
+        card.pack(expand=True, padx=80, pady=60)
+
+        tk.Label(card, text='Đăng nhập', font=('Arial', 28, 'bold'), fg='#111827', bg='#ffffff').pack(anchor='w')
+        tk.Label(card, text='Truy cập hệ thống DAU Online Exam', font=('Arial', 11), fg='#64748b', bg='#ffffff').pack(anchor='w', pady=(5, 22))
+
+        tk.Label(card, text='Username / Mã sinh viên', font=('Arial', 10, 'bold'), fg='#334155', bg='#ffffff').pack(anchor='w')
+        self.username_entry = tk.Entry(card, width=40, font=('Arial', 12), bd=1, relief='solid', bg='#f8fafc', fg='#0f172a')
+        self.username_entry.pack(fill='x', pady=(6, 14))
+
+        tk.Label(card, text='Mật khẩu', font=('Arial', 10, 'bold'), fg='#334155', bg='#ffffff').pack(anchor='w')
+        self.password_frame = tk.Frame(card, bg='#ffffff')
+        self.password_frame.pack(fill='x', pady=(6, 14))
+        self.password_entry = tk.Entry(self.password_frame, width=34, font=('Arial', 12), show='*', bd=1, relief='solid', bg='#f8fafc', fg='#0f172a')
         self.password_entry.pack(side='left', fill='x', expand=True)
-        self.show_pass_btn = tk.Button(self.password_frame, text='Hiện', command=self.toggle_password, width=8)
+        self.show_pass_btn = tk.Button(self.password_frame, text='Hiện', command=self.toggle_password, width=8, bg='#e2e8f0', fg='#0f172a', relief='flat', font=('Arial', 10, 'bold'))
         self.show_pass_btn.pack(side='right', padx=(8, 0))
 
-        tk.Label(panel, text='Server IP', font=('Arial', 10, 'bold'), fg='#102a43', bg='#ffffff').pack(anchor='w')
-        self.server_ip_entry = tk.Entry(panel, width=40, font=('Arial', 12), bd=1)
+        tk.Label(card, text='Server IP', font=('Arial', 10, 'bold'), fg='#334155', bg='#ffffff').pack(anchor='w')
+        self.server_ip_entry = tk.Entry(card, width=40, font=('Arial', 12), bd=1, relief='solid', bg='#f8fafc', fg='#0f172a')
         self.server_ip_entry.insert(0, '127.0.0.1')
-        self.server_ip_entry.pack(fill='x', pady=(5, 12))
+        self.server_ip_entry.pack(fill='x', pady=(6, 18))
 
-        self.login_btn = tk.Button(panel, text='Đăng nhập', width=24, command=self.login, bg='#0d6efd', fg='white', padx=14, pady=8, font=('Arial', 11, 'bold'))
-        self.login_btn.pack(pady=(10, 8))
+        self.login_btn = tk.Button(card, text='Đăng nhập', command=self.login, bg='#b91c1c', fg='white', padx=18, pady=12, font=('Arial', 11, 'bold'), relief='flat')
+        self.login_btn.pack(fill='x')
 
-        self.server_status = tk.Label(panel, text='Kết nối: Server chưa chạy', fg='#637381', bg='#ffffff', font=('Arial', 10))
-        self.server_status.pack(pady=(8, 0))
+        self.server_status = tk.Label(card, text='Kết nối: Server chưa chạy', fg='#64748b', bg='#ffffff', font=('Arial', 10))
+        self.server_status.pack(pady=(16, 0))
 
     def clear_all_widgets(self):
         for child in self.winfo_children():

@@ -18,14 +18,17 @@ class StatisticsScreen(tk.Frame):
         self.load_statistics()
 
     def build_ui(self):
-        self.configure(bg='#f5f5f5')
-        module_header(self, '📊', 'THỐNG KÊ HỆ THỐNG', 'Theo dõi tình hình học tập và hiệu quả các kỳ thi.')
+        self.configure(bg='#edf2f7')
+        header = tk.Frame(self, bg='#edf2f7', pady=6)
+        header.pack(fill='x')
+        tk.Label(header, text='SYSTEM ANALYTICS', font=('Arial', 28, 'bold'), bg='#edf2f7', fg='#0f172a').pack(anchor='w')
+        tk.Label(header, text='Theo dõi hiệu quả thi, tiến độ học tập và điểm số theo kỳ thi.', font=('Arial', 11), bg='#edf2f7', fg='#64748b').pack(anchor='w', pady=(4, 14))
 
-        self.summary_frame = tk.Frame(self, bg='#f5f5f5')
-        self.summary_frame.pack(fill='x', pady=(16, 4))
+        self.summary_frame = tk.Frame(self, bg='#edf2f7')
+        self.summary_frame.pack(fill='x', pady=(0, 16))
 
-        self.charts_frame = tk.Frame(self, bg='#f5f5f5')
-        self.charts_frame.pack(fill='both', expand=True, pady=(12, 0))
+        self.charts_frame = tk.Frame(self, bg='#ffffff', padx=16, pady=16, highlightbackground='#e2e8f0', highlightthickness=1)
+        self.charts_frame.pack(fill='both', expand=True, pady=(0, 0))
 
         self.per_exam_tree = ttk.Treeview(self.charts_frame, columns=('exam','students','completed','not_done','avg','high','low'), show='headings', height=10)
         configure_tree(self.per_exam_tree)

@@ -19,46 +19,42 @@ class ResultManagementScreen(tk.Frame):
         self.load_results()
 
     def build_ui(self):
-        self.configure(bg='#f5f5f5')
-        module_header(self, '📊', 'KẾT QUẢ THI', 'Xem, lọc và theo dõi kết quả làm bài của sinh viên.')
+        self.configure(bg='#edf2f7')
+        header = tk.Frame(self, bg='#edf2f7', pady=6)
+        header.pack(fill='x')
+        tk.Label(header, text='EXAM PERFORMANCE', font=('Arial', 28, 'bold'), bg='#edf2f7', fg='#0f172a').pack(anchor='w')
+        tk.Label(header, text='Theo dõi kết quả thi và xu hướng làm bài của sinh viên.', font=('Arial', 11), bg='#edf2f7', fg='#64748b').pack(anchor='w', pady=(4, 14))
 
-        bar = toolbar(self)
+        bar = tk.Frame(self, bg='#edf2f7')
+        bar.pack(fill='x', pady=(0, 14))
         self.search_var = tk.StringVar()
-        tk.Entry(bar, textvariable=self.search_var, width=40, font=('Arial', 11)).pack(side='left', padx=(0, 8))
-        primary_button(bar, '🔍 Tìm kiếm', self.load_results).pack(side='left')
+        search_box = tk.Entry(bar, textvariable=self.search_var, width=40, font=('Arial', 11), relief='solid', bg='#ffffff', fg='#0f172a')
+        search_box.pack(side='left', padx=(0, 8))
+        tk.Button(bar, text='Tìm kiếm', command=self.load_results, bg='#7f1d2d', fg='white', font=('Arial', 10, 'bold'), padx=16, pady=8, relief='flat').pack(side='left')
 
-        self.filter_frame = tk.Frame(self, bg='#f5f5f5')
-        self.filter_frame.pack(fill='x', pady=(10, 8))
+        self.filter_frame = tk.Frame(self, bg='#edf2f7')
+        self.filter_frame.pack(fill='x', pady=(0, 12))
 
         self.exam_var = tk.StringVar(value='all')
         self.room_var = tk.StringVar(value='all')
         self.status_var = tk.StringVar(value='all')
         self.date_var = tk.StringVar(value='all')
 
-        tk.Label(self.filter_frame, text='Kỳ thi', bg='#f5f5f5').grid(row=0, column=0, padx=(0, 8))
-        ttk.Combobox(self.filter_frame, textvariable=self.exam_var, values=['all'], state='readonly', width=16).grid(row=0, column=1, padx=(0, 8))
-        tk.Label(self.filter_frame, text='Phòng thi', bg='#f5f5f5').grid(row=0, column=2, padx=(0, 8))
-        ttk.Combobox(self.filter_frame, textvariable=self.room_var, values=['all'], state='readonly', width=16).grid(row=0, column=3, padx=(0, 8))
-        tk.Label(self.filter_frame, text='Trạng thái', bg='#f5f5f5').grid(row=0, column=4, padx=(0, 8))
-        ttk.Combobox(self.filter_frame, textvariable=self.status_var, values=['all'], state='readonly', width=16).grid(row=0, column=5, padx=(0, 8))
-        tk.Label(self.filter_frame, text='Ngày', bg='#f5f5f5').grid(row=0, column=6, padx=(0, 8))
-        ttk.Combobox(self.filter_frame, textvariable=self.date_var, values=['all'], state='readonly', width=16).grid(row=0, column=7)
+        for idx, (label, var, values) in enumerate([
+            ('Kỳ thi', self.exam_var, ['all']),
+            ('Phòng thi', self.room_var, ['all']),
+            ('Trạng thái', self.status_var, ['all']),
+            ('Ngày', self.date_var, ['all']),
+        ]):
+            tk.Label(self.filter_frame, text=label, bg='#edf2f7', fg='#475569', font=('Arial', 10, 'bold')).grid(row=0, column=idx * 2, padx=(0, 8), pady=4)
+            ttk.Combobox(self.filter_frame, textvariable=var, values=values, state='readonly', width=16).grid(row=0, column=idx * 2 + 1, padx=(0, 18), pady=4)
 
-        table_frame = panel(self, 10)
+        table_frame = tk.Frame(self, bg='#ffffff', padx=14, pady=14, highlightbackground='#e2e8f0', highlightthickness=1)
         table_frame.pack(fill='both', expand=True)
         self.tree = ttk.Treeview(table_frame, columns=('stt','student_code','full_name','class_name','exam_title','room_code','correct_answers','wrong_answers','score','duration','status'), show='headings', height=16)
         configure_tree(self.tree)
-        self.tree.heading('stt', text='STT')
-        self.tree.heading('student_code', text='Mã SV')
-        self.tree.heading('full_name', text='Họ tên')
-        self.tree.heading('class_name', text='Lớp')
-        self.tree.heading('exam_title', text='Kỳ thi')
-        self.tree.heading('room_code', text='Phòng')
-        self.tree.heading('correct_answers', text='Số câu đúng')
-        self.tree.heading('wrong_answers', text='Số câu sai')
-        self.tree.heading('score', text='Điểm')
-        self.tree.heading('duration', text='Thời gian')
-        self.tree.heading('status', text='Trạng thái')
+        for col, text in [('stt','STT'), ('student_code','Mã SV'), ('full_name','Họ tên'), ('class_name','Lớp'), ('exam_title','Kỳ thi'), ('room_code','Phòng'), ('correct_answers','Đúng'), ('wrong_answers','Sai'), ('score','Điểm'), ('duration','Thời gian'), ('status','Trạng thái')]:
+            self.tree.heading(col, text=text)
         self.tree.pack(fill='both', expand=True)
         self.tree.bind('<Double-1>', self.open_detail)
 

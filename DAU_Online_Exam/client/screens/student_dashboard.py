@@ -24,80 +24,93 @@ class StudentDashboard(tk.Frame):
         self.load_data()
 
     def build_ui(self):
-        self.configure(bg='#f5f5f5')
-        # Sidebar: only the requested student tabs.
-        self.sidebar = tk.Frame(self, bg='#7F1D1D', width=250)
+        self.configure(bg='#edf2f7')
+
+        self.sidebar = tk.Frame(self, bg='#0f172a', width=250)
         self.sidebar.pack(side='left', fill='y')
         self.sidebar.pack_propagate(False)
 
-        logo = tk.Frame(self.sidebar, bg='#7F1D1D', padx=20, pady=26)
+        logo = tk.Frame(self.sidebar, bg='#0f172a', padx=18, pady=28)
         logo.pack(fill='x')
-        tk.Label(logo, text='DAU', font=('Arial', 30, 'bold'), fg='#ffffff', bg='#7F1D1D').pack(anchor='center')
-        tk.Label(logo, text='ONLINE EXAM', font=('Arial', 11, 'bold'), fg='#FFD7D7', bg='#7F1D1D').pack(anchor='center', pady=(6, 0))
+        tk.Label(logo, text='DAU', font=('Arial', 30, 'bold'), fg='#ffffff', bg='#0f172a').pack(anchor='center')
+        tk.Label(logo, text='ONLINE EXAM', font=('Arial', 11, 'bold'), fg='#fca5a5', bg='#0f172a').pack(anchor='center', pady=(8, 0))
 
-        menu_frame = tk.Frame(self.sidebar, bg='#7F1D1D')
-        menu_frame.pack(fill='x', pady=16)
+        menu_frame = tk.Frame(self.sidebar, bg='#0f172a')
+        menu_frame.pack(fill='x', pady=18)
 
         menu = [
             ('📝 KỲ THI', 'exam'),
             ('👤 HỒ SƠ', 'profile'),
         ]
         for text, key in menu:
-            btn = tk.Button(menu_frame, text=text, bg='#7F1D1D', fg='#ffffff', font=('Arial', 11, 'bold'), bd=0,
-                            anchor='w', padx=22, pady=12, width=20,
-                            command=lambda k=key: self.menu_action(k))
-            btn.pack(fill='x', padx=16, pady=3)
+            btn = tk.Button(
+                menu_frame, text=text, bg='#111827', fg='#e2e8f0', font=('Arial', 11, 'bold'), bd=0,
+                anchor='w', padx=22, pady=12, width=20,
+                command=lambda k=key: self.menu_action(k),
+                activebackground='#1d4ed8', activeforeground='#ffffff'
+            )
+            btn.pack(fill='x', padx=16, pady=4)
 
-        logout_frame = tk.Frame(self.sidebar, bg='#7F1D1D')
+        logout_frame = tk.Frame(self.sidebar, bg='#0f172a')
         logout_frame.pack(side='bottom', fill='x', pady=24)
-        tk.Button(logout_frame, text='🚪 ĐĂNG XUẤT', command=self.handle_logout, bg='#B91C1C', fg='#ffffff', font=('Arial', 11, 'bold'), bd=0, padx=12, pady=12).pack(fill='x', padx=16)
+        tk.Button(logout_frame, text='🚪 ĐĂNG XUẤT', command=self.handle_logout, bg='#b91c1c', fg='#ffffff', font=('Arial', 11, 'bold'), bd=0, padx=12, pady=12).pack(fill='x', padx=16)
 
-        # Main content
-        self.content = tk.Frame(self, bg='#f5f5f5')
+        self.content = tk.Frame(self, bg='#edf2f7')
         self.content.pack(side='left', fill='both', expand=True)
 
-        # Topbar
-        self.topbar = tk.Frame(self.content, bg='#ffffff', height=72)
+        self.topbar = tk.Frame(self.content, bg='#ffffff', height=78)
         self.topbar.pack(fill='x')
         self.topbar.pack_propagate(False)
-
-        tk.Label(self.topbar, text='🔴 DAU ONLINE EXAM', font=('Arial', 18, 'bold'), fg='#7F1D1D', bg='#ffffff').pack(side='left', padx=26, pady=16)
+        tk.Label(self.topbar, text='DAU ONLINE EXAM', font=('Arial', 20, 'bold'), fg='#0f172a', bg='#ffffff').pack(side='left', padx=26, pady=18)
 
         top_right = tk.Frame(self.topbar, bg='#ffffff')
         top_right.pack(side='right', fill='y', padx=22)
-        self.net_status = tk.Label(self.topbar, text='● Server Online', font=('Arial', 10, 'bold'), bg='#ffffff', fg='#15803d')
-        self.net_status.pack(side='right', padx=(0, 20))
-        tk.Label(top_right, text='🔔', font=('Arial', 15), bg='#ffffff', fg='#7F1D1D').pack(side='left', padx=(0, 8))
-        tk.Label(top_right, text=self.current_user.get('full_name') or 'Sinh viên', font=('Arial', 11, 'bold'), bg='#ffffff', fg='#1f2937').pack(side='left', padx=(0, 4))
-        tk.Label(top_right, text=self.current_user.get('student_code') or self.current_user.get('username') or 'SV', font=('Arial', 10), bg='#ffffff', fg='#6b7280').pack(side='left')
+        self.net_status = tk.Label(self.topbar, text='● Server Online', font=('Arial', 10, 'bold'), bg='#ffffff', fg='#16a34a')
+        self.net_status.pack(side='right', padx=(0, 18))
+        tk.Label(top_right, text='🔔', font=('Arial', 15), bg='#ffffff', fg='#b91c1c').pack(side='left', padx=(0, 10))
+        tk.Label(top_right, text=self.current_user.get('full_name') or 'Sinh viên', font=('Arial', 11, 'bold'), bg='#ffffff', fg='#111827').pack(side='left', padx=(0, 4))
+        tk.Label(top_right, text=self.current_user.get('student_code') or self.current_user.get('username') or 'SV', font=('Arial', 10), bg='#ffffff', fg='#64748b').pack(side='left')
 
-        # Dashboard main area
-        self.main = tk.Frame(self.content, bg='#f5f5f5', padx=26, pady=24)
+        self.main = tk.Frame(self.content, bg='#edf2f7', padx=26, pady=24)
         self.main.pack(fill='both', expand=True)
 
-        self.title_label = tk.Label(self.main, text='KỲ THI CỦA TÔI', font=('Arial', 24, 'bold'), bg='#f5f5f5', fg='#1f2937', justify='left')
+        self.title_label = tk.Label(self.main, text='Kỳ thi của tôi', font=('Arial', 28, 'bold'), bg='#edf2f7', fg='#0f172a', justify='left')
         self.title_label.pack(anchor='w')
 
-        self.subtitle_label = tk.Label(self.main, text='Các kỳ thi bạn được tham gia', font=('Arial', 11), bg='#f5f5f5', fg='#6b7280')
-        self.subtitle_label.pack(anchor='w', pady=(4, 16))
+        self.subtitle_label = tk.Label(self.main, text='Các kỳ thi bạn được tổ chức và theo dõi', font=('Arial', 11), bg='#edf2f7', fg='#64748b')
+        self.subtitle_label.pack(anchor='w', pady=(6, 18))
 
-        self.active_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=20)
+        self.summary_bar = tk.Frame(self.main, bg='#edf2f7')
+        self.summary_bar.pack(fill='x', pady=(0, 18))
+
+        for label, value, color in [
+            ('Kỳ thi khả dụng', '0', '#2563eb'),
+            ('Đã hoàn thành', '0', '#16a34a'),
+            ('Điểm trung bình', '0', '#b91c1c'),
+            ('Online', '1', '#7c3aed'),
+        ]:
+            card = tk.Frame(self.summary_bar, bg='#ffffff', padx=18, pady=16, highlightbackground='#e2e8f0', highlightthickness=1)
+            card.pack(side='left', fill='y', expand=True, padx=(0, 12))
+            tk.Label(card, text=value, font=('Arial', 22, 'bold'), bg='#ffffff', fg=color).pack(anchor='w')
+            tk.Label(card, text=label, font=('Arial', 10), bg='#ffffff', fg='#64748b').pack(anchor='w', pady=(4, 0))
+
+        self.active_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=20, highlightbackground='#e2e8f0', highlightthickness=1)
         self.active_frame.pack(fill='x', pady=(0, 16))
-        tk.Label(self.active_frame, text='🔴 KỲ THI ĐANG DIỄN RA', font=('Arial', 14, 'bold'), bg='#ffffff', fg='#7F1D1D').pack(anchor='w')
+        tk.Label(self.active_frame, text='Kỳ thi đang diễn ra', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
         self.active_content = tk.Frame(self.active_frame, bg='#ffffff')
-        self.active_content.pack(fill='x', pady=(10, 0))
+        self.active_content.pack(fill='x', pady=(12, 0))
 
-        self.upcoming_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18)
+        self.upcoming_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18, highlightbackground='#e2e8f0', highlightthickness=1)
         self.upcoming_frame.pack(fill='x', pady=(0, 16))
-        tk.Label(self.upcoming_frame, text='KỲ THI SẮP DIỄN RA', font=('Arial', 14, 'bold'), bg='#ffffff', fg='#1f2937').pack(anchor='w')
+        tk.Label(self.upcoming_frame, text='Kỳ thi sắp diễn ra', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
         self.upcoming_content = tk.Frame(self.upcoming_frame, bg='#ffffff')
-        self.upcoming_content.pack(fill='x', pady=(10, 0))
+        self.upcoming_content.pack(fill='x', pady=(12, 0))
 
-        self.completed_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18)
+        self.completed_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18, highlightbackground='#e2e8f0', highlightthickness=1)
         self.completed_frame.pack(fill='x')
-        tk.Label(self.completed_frame, text='KỲ THI ĐÃ HOÀN THÀNH', font=('Arial', 14, 'bold'), bg='#ffffff', fg='#1f2937').pack(anchor='w')
+        tk.Label(self.completed_frame, text='Kỳ thi đã hoàn thành', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
         self.completed_content = tk.Frame(self.completed_frame, bg='#ffffff')
-        self.completed_content.pack(fill='x', pady=(10, 0))
+        self.completed_content.pack(fill='x', pady=(12, 0))
 
     def menu_action(self, key):
         if self.exam_state == 'IN_PROGRESS' and self.exam_window is not None:
@@ -126,49 +139,68 @@ class StudentDashboard(tk.Frame):
             child.destroy()
 
     def rebuild_exam_layout(self):
-        self.title_label = tk.Label(self.main, text='KỲ THI CỦA TÔI', font=('Arial', 24, 'bold'), bg='#f5f5f5', fg='#1f2937', justify='left')
+        self.title_label = tk.Label(self.main, text='Kỳ thi của tôi', font=('Arial', 28, 'bold'), bg='#edf2f7', fg='#0f172a', justify='left')
         self.title_label.pack(anchor='w')
 
-        self.subtitle_label = tk.Label(self.main, text='Các kỳ thi bạn được tham gia', font=('Arial', 11), bg='#f5f5f5', fg='#6b7280')
-        self.subtitle_label.pack(anchor='w', pady=(4, 16))
+        self.subtitle_label = tk.Label(self.main, text='Các kỳ thi bạn được tổ chức và theo dõi', font=('Arial', 11), bg='#edf2f7', fg='#64748b')
+        self.subtitle_label.pack(anchor='w', pady=(6, 18))
 
-        self.active_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=20)
+        self.summary_bar = tk.Frame(self.main, bg='#edf2f7')
+        self.summary_bar.pack(fill='x', pady=(0, 18))
+        for label, value, color in [
+            ('Kỳ thi khả dụng', '0', '#2563eb'),
+            ('Đã hoàn thành', '0', '#16a34a'),
+            ('Điểm trung bình', '0', '#b91c1c'),
+            ('Online', '1', '#7c3aed'),
+        ]:
+            card = tk.Frame(self.summary_bar, bg='#ffffff', padx=18, pady=16, highlightbackground='#e2e8f0', highlightthickness=1)
+            card.pack(side='left', fill='y', expand=True, padx=(0, 12))
+            tk.Label(card, text=value, font=('Arial', 22, 'bold'), bg='#ffffff', fg=color).pack(anchor='w')
+            tk.Label(card, text=label, font=('Arial', 10), bg='#ffffff', fg='#64748b').pack(anchor='w', pady=(4, 0))
+
+        self.active_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=20, highlightbackground='#e2e8f0', highlightthickness=1)
         self.active_frame.pack(fill='x', pady=(0, 16))
-        tk.Label(self.active_frame, text='🔴 KỲ THI ĐANG DIỄN RA', font=('Arial', 14, 'bold'), bg='#ffffff', fg='#7F1D1D').pack(anchor='w')
+        tk.Label(self.active_frame, text='Kỳ thi đang diễn ra', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
         self.active_content = tk.Frame(self.active_frame, bg='#ffffff')
-        self.active_content.pack(fill='x', pady=(10, 0))
+        self.active_content.pack(fill='x', pady=(12, 0))
 
-        self.upcoming_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18)
+        self.upcoming_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18, highlightbackground='#e2e8f0', highlightthickness=1)
         self.upcoming_frame.pack(fill='x', pady=(0, 16))
-        tk.Label(self.upcoming_frame, text='KỲ THI SẮP DIỄN RA', font=('Arial', 14, 'bold'), bg='#ffffff', fg='#1f2937').pack(anchor='w')
+        tk.Label(self.upcoming_frame, text='Kỳ thi sắp diễn ra', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
         self.upcoming_content = tk.Frame(self.upcoming_frame, bg='#ffffff')
-        self.upcoming_content.pack(fill='x', pady=(10, 0))
+        self.upcoming_content.pack(fill='x', pady=(12, 0))
 
-        self.completed_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18)
+        self.completed_frame = tk.Frame(self.main, bg='#ffffff', padx=20, pady=18, highlightbackground='#e2e8f0', highlightthickness=1)
         self.completed_frame.pack(fill='x')
-        tk.Label(self.completed_frame, text='KỲ THI ĐÃ HOÀN THÀNH', font=('Arial', 14, 'bold'), bg='#ffffff', fg='#1f2937').pack(anchor='w')
+        tk.Label(self.completed_frame, text='Kỳ thi đã hoàn thành', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
         self.completed_content = tk.Frame(self.completed_frame, bg='#ffffff')
-        self.completed_content.pack(fill='x', pady=(10, 0))
+        self.completed_content.pack(fill='x', pady=(12, 0))
 
     def show_profile_screen(self):
         if self.exam_state == 'IN_PROGRESS':
             return
         self.clear_main_content()
-        profile = tk.Frame(self.main, bg='#ffffff', padx=30, pady=30)
+        profile = tk.Frame(self.main, bg='#ffffff', padx=32, pady=32, highlightbackground='#e2e8f0', highlightthickness=1)
         profile.pack(fill='both', expand=True)
-        tk.Label(profile, text='HỒ SƠ SINH VIÊN', font=('Arial', 22, 'bold'), bg='#ffffff', fg='#7F1D1D').pack(anchor='w')
-        avatar = tk.Label(profile, text='👤', font=('Arial', 48), bg='#ffffff', fg='#7F1D1D')
-        avatar.pack(pady=(20, 10))
+
+        header = tk.Frame(profile, bg='#ffffff')
+        header.pack(fill='x')
+        tk.Label(header, text='Hồ sơ sinh viên', font=('Arial', 26, 'bold'), bg='#ffffff', fg='#0f172a').pack(anchor='w')
+        tk.Label(header, text='Thông tin tài khoản và dữ liệu cá nhân', font=('Arial', 11), bg='#ffffff', fg='#64748b').pack(anchor='w', pady=(6, 20))
+
+        avatar = tk.Label(profile, text='👤', font=('Arial', 54), bg='#ffffff', fg='#b91c1c')
+        avatar.pack(pady=(10, 10))
         user = self.current_user or {}
-        tk.Label(profile, text=user.get('full_name') or 'Sinh viên', font=('Arial', 16, 'bold'), bg='#ffffff', fg='#1f2937').pack(anchor='center')
-        tk.Label(profile, text=f"Mã sinh viên: {user.get('student_code') or user.get('username') or 'SV'}", bg='#ffffff', fg='#4b5563').pack(anchor='w', pady=(8, 4))
-        tk.Label(profile, text=f"Lớp: {user.get('class_name') or '-'}", bg='#ffffff', fg='#4b5563').pack(anchor='w', pady=4)
-        tk.Label(profile, text=f"Username: {user.get('username') or '-'}", bg='#ffffff', fg='#4b5563').pack(anchor='w', pady=4)
-        tk.Label(profile, text=f"Email: {user.get('email') or '-'}", bg='#ffffff', fg='#4b5563').pack(anchor='w', pady=4)
+        tk.Label(profile, text=user.get('full_name') or 'Sinh viên', font=('Arial', 20, 'bold'), bg='#ffffff', fg='#111827').pack(anchor='center')
+        tk.Label(profile, text=f"Mã sinh viên: {user.get('student_code') or user.get('username') or 'SV'}", bg='#ffffff', fg='#475569').pack(anchor='w', pady=(18, 6))
+        tk.Label(profile, text=f"Lớp: {user.get('class_name') or '-'}", bg='#ffffff', fg='#475569').pack(anchor='w', pady=6)
+        tk.Label(profile, text=f"Username: {user.get('username') or '-'}", bg='#ffffff', fg='#475569').pack(anchor='w', pady=6)
+        tk.Label(profile, text=f"Email: {user.get('email') or '-'}", bg='#ffffff', fg='#475569').pack(anchor='w', pady=6)
+
         btn_row = tk.Frame(profile, bg='#ffffff')
-        btn_row.pack(fill='x', pady=(20, 0))
-        tk.Button(btn_row, text='CHỈNH SỬA', bg='#7F1D1D', fg='white', width=15, command=lambda: messagebox.showinfo('Thông báo', 'Tính năng chỉnh sửa hồ sơ đang được tích hợp.')).pack(side='left', padx=(0, 8))
-        tk.Button(btn_row, text='ĐỔI MẬT KHẨU', bg='#ffffff', fg='#7F1D1D', width=15, borderwidth=1, relief='solid', command=lambda: messagebox.showinfo('Thông báo', 'Tính năng đổi mật khẩu đang được tích hợp.')).pack(side='left')
+        btn_row.pack(fill='x', pady=(24, 0))
+        tk.Button(btn_row, text='CHỈNH SỬA', bg='#b91c1c', fg='white', width=16, command=lambda: messagebox.showinfo('Thông báo', 'Tính năng chỉnh sửa hồ sơ đang được tích hợp.')).pack(side='left', padx=(0, 8))
+        tk.Button(btn_row, text='ĐỔI MẬT KHẨU', bg='#ffffff', fg='#0f172a', width=16, borderwidth=1, relief='solid', command=lambda: messagebox.showinfo('Thông báo', 'Tính năng đổi mật khẩu đang được tích hợp.')).pack(side='left')
 
     def load_data(self):
         # Keep the student dashboard focused on the exam view, as requested.

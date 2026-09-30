@@ -144,9 +144,8 @@ class QuestionManagementWindow(tk.Frame):
         })
 
     def _clear_form_panel(self):
-        for child in self.frame.winfo_children():
-            if getattr(child, 'name', '') == 'question_form_frame':
-                child.destroy()
+        for child in self.form_host.winfo_children():
+            child.destroy()
 
     def delete_selected_question(self):
         selected = self.tree.selection()
