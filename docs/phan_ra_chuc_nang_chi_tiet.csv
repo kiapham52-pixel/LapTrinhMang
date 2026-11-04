@@ -1,0 +1,56 @@
+﻿Mã;Phân hệ;Chức năng;Chức năng nhỏ;Tác nhân chính;Tác nhân phụ;Lượng dữ liệu (ước lượng);Input chính;Input phụ
+TK-01;Tài khoản;Đăng nhập;Nhập thông tin; xác thực username/mật khẩu; kiểm tra trạng thái; tạo/cập nhật phiên online;Sinh viên / Quản trị viên;Client; Server; CSDL;1 yêu cầu; 1 tài khoản; 1 phiên;Username; mật khẩu;Thời điểm đăng nhập; trạng thái tài khoản
+TK-02;Tài khoản;Duy trì phiên;Gửi heartbeat; cập nhật trạng thái và thời điểm hoạt động gần nhất;Sinh viên / Quản trị viên;Client; Server; CSDL;1 phiên mỗi lần gọi;User ID;Thời điểm heartbeat
+TK-03;Tài khoản;Đăng xuất;Gửi yêu cầu đăng xuất; chuyển phiên thành OFFLINE;Sinh viên / Quản trị viên;Client; Server; CSDL;1 phiên;User ID;Thời điểm đăng xuất
+TK-04;Hồ sơ;Xem hồ sơ cá nhân;Hiển thị mã sinh viên; họ tên; lớp; username; email;Sinh viên;Client; Server; CSDL;1 hồ sơ;User ID;Dữ liệu hồ sơ trả về
+TK-05;Hồ sơ;Sửa hồ sơ / đổi mật khẩu;Mở giao diện chỉnh sửa hồ sơ hoặc đổi mật khẩu;Sinh viên;Client;1 hồ sơ / yêu cầu;Chưa có input được xử lý;Dữ liệu hồ sơ/mật khẩu mới dự kiến; chức năng hiện chưa cập nhật CSDL
+SV-01;Quản lý sinh viên;Xem danh sách;Tải và hiển thị danh sách sinh viên cùng trạng thái phiên;Quản trị viên;Client; Server; CSDL;N hồ sơ sinh viên;Role quản trị;Trạng thái phiên; thời điểm online gần nhất
+SV-02;Quản lý sinh viên;Tìm kiếm sinh viên;Tìm theo mã sinh viên; họ tên; username hoặc lớp;Quản trị viên;Client; Server; CSDL;1 từ khóa; tối đa N kết quả;Từ khóa tìm kiếm;Role quản trị
+SV-03;Quản lý sinh viên;Thêm sinh viên;Nhập thông tin; kiểm tra mã/username trùng; tạo tài khoản;Quản trị viên;Client; Server; CSDL;1 hồ sơ;Mã sinh viên; username;Họ tên; email; lớp; mật khẩu; trạng thái
+SV-04;Quản lý sinh viên;Sửa sinh viên;Cập nhật thông tin hoặc trạng thái; kiểm tra mã/username trùng;Quản trị viên;Client; Server; CSDL;1 hồ sơ;Student ID;Mã sinh viên; họ tên; username; email; lớp; trạng thái; mật khẩu mới nếu có
+SV-05;Quản lý sinh viên;Xóa sinh viên;Chuyển tài khoản sinh viên thành inactive để giữ lịch sử;Quản trị viên;Client; Server; CSDL;1 tài khoản;Student ID hoặc mã sinh viên;User ID quản trị viên hiện tại
+SV-06;Trạng thái online;Theo dõi sinh viên online;Lấy danh sách sinh viên và trạng thái phiên/last_seen;Quản trị viên;Client; Server; CSDL;N sinh viên;Role quản trị;Session status; last_seen
+MH-01;Môn học;Xem danh sách môn;Hiển thị môn học và số câu hỏi/số đề liên quan;Quản trị viên;Client; Server; CSDL;N môn học;Yêu cầu danh sách;Role; số liệu đếm liên quan
+MH-02;Môn học;Thêm môn học;Tạo môn; kiểm tra trùng mã hoặc tên;Quản trị viên;Client; Server; CSDL;1 môn học;Mã môn; tên môn;Mô tả; trạng thái
+MH-03;Môn học;Sửa môn học;Cập nhật thông tin; đổi tên thì cập nhật tên môn trong câu hỏi;Quản trị viên;Client; Server; CSDL;1 môn và có thể N câu hỏi;ID môn; mã môn; tên môn;Mô tả; trạng thái
+CH-01;Ngân hàng câu hỏi;Xem câu hỏi;Tải toàn bộ câu hỏi hoặc câu hỏi gắn với một đề;Quản trị viên;Client; Server; CSDL;N câu hỏi;Yêu cầu danh sách;Exam ID nếu lọc theo đề
+CH-02;Ngân hàng câu hỏi;Tìm câu hỏi;Tìm theo nội dung; môn học hoặc độ khó;Quản trị viên;Client; Server; CSDL;1 từ khóa; tối đa N câu hỏi;Từ khóa;Role quản trị
+CH-03;Ngân hàng câu hỏi;Thêm câu hỏi;Nhập nội dung; bốn lựa chọn; đáp án đúng; môn và độ khó;Quản trị viên;Client; Server; CSDL;1 câu hỏi;Nội dung; lựa chọn A/B/C/D; đáp án đúng;Môn học; độ khó
+CH-04;Ngân hàng câu hỏi;Sửa câu hỏi;Cập nhật nội dung; các lựa chọn; đáp án; môn và độ khó;Quản trị viên;Client; Server; CSDL;1 câu hỏi;Question ID;Nội dung; lựa chọn A/B/C/D; đáp án đúng; môn; độ khó
+CH-05;Ngân hàng câu hỏi;Xóa câu hỏi;Kiểm tra câu hỏi có được đề sử dụng; chỉ xóa nếu chưa được sử dụng;Quản trị viên;Client; Server; CSDL;1 câu hỏi; kiểm tra N liên kết;Question ID;Role quản trị
+DT-01;Đề thi;Xem danh sách đề;Hiển thị tên đề; môn; thời lượng; số câu; trạng thái;Quản trị viên / Sinh viên;Client; Server; CSDL;N đề;Yêu cầu danh sách;Thông tin câu hỏi liên kết
+DT-02;Đề thi;Tạo đề thi;Tạo đề mới và gắn môn học;Quản trị viên;Client; Server; CSDL;1 đề;Tên đề; môn học;Mô tả; thời lượng; trạng thái
+DT-03;Đề thi;Sửa đề thi;Cập nhật tên; mô tả; thời lượng; số câu; môn; trạng thái;Quản trị viên;Client; Server; CSDL;1 đề;Exam ID; tên đề;Mô tả; thời lượng; môn; trạng thái
+DT-04;Đề thi;Xóa đề thi;Xóa đề và các liên kết câu hỏi theo ràng buộc CSDL;Quản trị viên;Client; Server; CSDL;1 đề; N liên kết;Exam ID;Role quản trị
+DT-05;Đề thi;Xem câu hỏi trong đề;Lấy danh sách câu hỏi đang gắn với đề;Quản trị viên;Client; Server; CSDL;1 đề; N câu hỏi;Exam ID;Role quản trị
+DT-06;Đề thi;Thêm câu hỏi vào đề;Chọn nhiều câu hỏi; kiểm tra tồn tại; bỏ qua liên kết trùng;Quản trị viên;Client; Server; CSDL;1 đề; N câu hỏi được chọn;Exam ID; danh sách Question ID;Role quản trị
+DT-07;Đề thi;Gỡ câu hỏi khỏi đề;Xóa liên kết giữa đề thi và câu hỏi;Quản trị viên;Client; Server; CSDL;1 liên kết đề-câu hỏi;Exam ID; Question ID;Role quản trị
+PT-01;Phòng thi;Xem danh sách phòng;Hiển thị phòng; đề; trạng thái; số tham gia; online; đã nộp;Quản trị viên;Client; Server; CSDL;N phòng; N lượt tham gia;Yêu cầu danh sách;Exam ID; dữ liệu thành viên/phiên
+PT-02;Phòng thi;Tạo phòng;Nhập phòng; đề; môn; thời gian; trạng thái; cấu hình; kiểm tra hợp lệ;Quản trị viên;Client; Server; CSDL;1 phòng;Mã phòng; tên; Exam ID; môn; thời lượng; giờ bắt đầu/kết thúc;Mật khẩu; trạng thái; tự nộp; đảo câu/đáp án; số lần thi; cho phép tham gia
+PT-03;Phòng thi;Sửa phòng;Cập nhật thông tin và cấu hình phòng;Quản trị viên;Client; Server; CSDL;1 phòng;Room ID;Mã/tên phòng; đề; môn; thời lượng; thời gian; trạng thái; cấu hình
+PT-04;Phòng thi;Xóa phòng;Xóa phòng thi;Quản trị viên;Client; Server; CSDL;1 phòng;Room ID;Role quản trị
+PT-05;Phòng thi;Điều khiển trạng thái;Mở phòng; bắt đầu; kết thúc hoặc đóng/hủy; kiểm tra đề có câu hỏi khi bắt đầu;Quản trị viên;Client; Server; CSDL;1 phòng; khi bắt đầu kiểm tra N câu hỏi;Room ID; thao tác trạng thái;Role quản trị
+PT-06;Phòng thi;Xem người tham gia;Xem danh sách sinh viên; trạng thái tham gia/thi/nộp và phiên;Quản trị viên;Client; Server; CSDL;1 phòng; N sinh viên;Room ID;Thời điểm tham gia; bắt đầu; nộp; trạng thái phiên
+PT-07;Phòng thi;Tham gia phòng;Ghi nhận sinh viên vào phòng; không tạo liên kết trùng;Sinh viên;Client; Server; CSDL;1 sinh viên; 1 phòng;Room ID; User ID;Thời điểm tham gia; trạng thái
+PT-08;Phòng thi;Giám sát phòng;Xem dữ liệu tổng quan phòng và sinh viên;Quản trị viên;Client; Server; CSDL;1 hoặc N phòng;Phòng được chọn;Số sinh viên; online; đã nộp;Chức năng giám sát trong giao diện còn hạn chế
+TH-01;Thi trực tuyến;Xem kỳ thi;Tải danh sách kỳ thi và thông tin đề;Sinh viên;Client; Server; CSDL;N đề thi;Yêu cầu danh sách;Trạng thái; môn; thời lượng; số câu
+TH-02;Thi trực tuyến;Bắt đầu thi;Kiểm tra vai trò; đề tồn tại; đề đang mở và có câu hỏi;Sinh viên;Client; Server; CSDL;1 đề; N câu hỏi;Exam ID; User ID; role;Trạng thái đề; dữ liệu câu hỏi
+TH-03;Thi trực tuyến;Trả lời câu hỏi;Chọn và lưu đáp án trong trạng thái bài thi trên client;Sinh viên;Client;1 đáp án mỗi thao tác; tổng N đáp án;Question ID; lựa chọn A/B/C/D;Trạng thái bài thi; đáp án trước đó
+TH-04;Thi trực tuyến;Điều hướng câu hỏi;Chuyển câu trước/sau hoặc nhảy đến câu;Sinh viên;Client;1 thao tác; 1 câu hiện tại;Chỉ số câu/câu cần tới;Đáp án hiện tại; trạng thái đánh dấu
+TH-05;Thi trực tuyến;Đánh dấu xem lại;Bật/tắt cờ xem lại cho câu hiện tại;Sinh viên;Client;1 cờ mỗi câu;Question ID; trạng thái cờ mới;Trạng thái câu trả lời
+TH-06;Thi trực tuyến;Dùng trợ giúp 50/50;Yêu cầu server trả về hai lựa chọn; hiển thị hai lựa chọn trên client;Sinh viên;Client; Server; CSDL;1 câu hỏi mỗi yêu cầu;User ID; Exam ID; Question ID;Role; số lượt trợ giúp còn lại được quản lý phía client
+TH-07;Thi trực tuyến;Theo dõi thời gian và tiến độ;Đếm ngược thời gian; tính phần trăm câu đã trả lời;Sinh viên;Client;1 bộ đếm; N trạng thái câu hỏi;Thời lượng đề;Đáp án đã chọn; thời gian còn lại
+TH-08;Thi trực tuyến;Nộp bài;Nộp thủ công hoặc tự động khi hết giờ; rời màn hình/đóng cửa sổ;Sinh viên;Client; Server; CSDL;1 lần nộp; tối đa N câu trả lời;User ID; Exam ID; danh sách đáp án; thời lượng;Lý do/source nộp; submission token
+TH-09;Chấm thi;Chấm và lưu bài;So đáp án; tính đúng/sai/bỏ trống và điểm; lưu lượt thi và câu trả lời;Server;CSDL;1 lượt thi; tối đa N câu trả lời;Đáp án sinh viên; Exam ID;Đáp án đúng; thời lượng; submission token
+TH-10;Kết quả cá nhân;Xem kết quả sau nộp;Hiển thị điểm; số đúng/sai/bỏ trống;Sinh viên;Client; Server; CSDL;1 kết quả;Attempt ID hoặc phản hồi sau nộp;Lý do nộp
+TH-11;Lịch sử cá nhân;Xem lịch sử thi;Lấy các lượt thi thuộc sinh viên hiện tại;Sinh viên;Client; Server; CSDL;1 sinh viên; N lượt thi;User ID; role;Tên đề; điểm; thời gian nộp
+TH-12;Kết quả cá nhân;Xem chi tiết kết quả;Xem lượt thi và từng câu trả lời; giới hạn sinh viên xem bài của mình;Sinh viên;Client; Server; CSDL;1 lượt thi; N câu trả lời;Attempt ID; User ID; role;Đáp án chọn; đáp án đúng; trạng thái đúng/sai
+KQ-01;Quản lý kết quả;Xem toàn bộ kết quả;Tải bảng kết quả theo các lượt thi;Quản trị viên;Client; Server; CSDL;N lượt thi;Role quản trị;Thông tin sinh viên; đề; phòng; điểm; thời gian; trạng thái
+KQ-02;Quản lý kết quả;Tìm kiếm/lọc kết quả;Nhập từ khóa hoặc chọn bộ lọc kỳ thi/phòng/trạng thái/ngày;Quản trị viên;Client;N kết quả hiển thị;Từ khóa/bộ lọc;Danh sách kết quả;Dịch vụ hiện trả danh sách tổng thể; cần xác nhận lọc được xử lý ở giao diện
+KQ-03;Quản lý kết quả;Xem chi tiết bài thi;Mở một lượt thi và xem thông tin cùng đáp án từng câu;Quản trị viên;Client; Server; CSDL;1 lượt thi; N câu trả lời;Attempt ID; role quản trị;Thông tin sinh viên; kỳ thi; phòng; điểm
+TK-06;Thống kê;Thống kê tổng quan;Tính tổng sinh viên; đề; phòng; lượt thi; điểm trung bình/cao nhất/thấp nhất; đạt/trượt;Quản trị viên;Client; Server; CSDL;Toàn bộ bản ghi liên quan;Role quản trị;Users; exams; rooms; attempts; điểm
+TK-07;Thống kê;Thống kê theo đề;Tính số sinh viên; lượt thi; hoàn thành/chưa thi; điểm từng đề;Quản trị viên;Client; Server; CSDL;N đề; N lượt thi;Role quản trị;Exam ID; điểm; trạng thái nộp
+TK-08;Dashboard;Xem dashboard quản trị;Hiển thị thẻ tổng quan và danh sách phòng chờ/đang thi;Quản trị viên;Client; Server; CSDL;1 bộ thống kê; N phòng hoạt động;Role quản trị;Số online; môn; câu hỏi; đề; phòng; lượt thi; điểm
+HT-01;Máy chủ;Nhận và xử lý yêu cầu;Nhận TCP; đọc JSON; định tuyến theo action; trả JSON;Client;Server;1 yêu cầu và 1 phản hồi mỗi lượt;Action; payload JSON;Socket; trạng thái kết nối
+HT-02;Cơ sở dữ liệu;Khởi tạo dữ liệu;Tạo bảng/chỉ mục và dữ liệu mẫu khi khởi tạo;Quản trị hệ thống;Server; SQLite;N bảng và các bản ghi mẫu;Đường dẫn CSDL;Schema; dữ liệu khởi tạo
+HT-03;Cơ sở dữ liệu;Lưu dữ liệu nghiệp vụ;Đọc/ghi tài khoản; câu hỏi; môn; đề; phòng; lượt thi; đáp án;Server;SQLite;1 đến N bản ghi tùy nghiệp vụ;Payload chức năng;Khóa liên kết; thời gian; trạng thái
