@@ -1,0 +1,26 @@
+Loại;Tác nhân;Đối tượng;Vai trò / quan hệ
+Nghiệp vụ;Sinh viên;Tài khoản (User);Đăng nhập, duy trì phiên và đăng xuất
+Nghiệp vụ;Sinh viên;Hồ sơ sinh viên (StudentProfile);Xem hồ sơ cá nhân
+Nghiệp vụ;Sinh viên;Phiên đăng nhập (Session);Tạo/cập nhật phiên và trạng thái online
+Nghiệp vụ;Sinh viên;Phòng thi (Room);Tham gia phòng thi
+Nghiệp vụ;Sinh viên;Người tham gia phòng (RoomParticipant);Được ghi nhận là người tham gia phòng
+Nghiệp vụ;Sinh viên;Lượt thi (Attempt);Bắt đầu, thực hiện và nộp bài thi
+Nghiệp vụ;Sinh viên;Câu trả lời (AttemptAnswer);Chọn đáp án và đánh dấu câu cần xem lại
+Nghiệp vụ;Sinh viên;Kết quả thi;Xem kết quả và lịch sử của bản thân (dữ liệu tổng hợp từ Attempt/AttemptAnswer)
+Nghiệp vụ;Quản trị viên;Tài khoản (User);Quản lý tài khoản sinh viên
+Nghiệp vụ;Quản trị viên;Hồ sơ sinh viên (StudentProfile);Xem, thêm, sửa, tìm kiếm và vô hiệu hóa hồ sơ
+Nghiệp vụ;Quản trị viên;Phiên đăng nhập (Session);Theo dõi trạng thái online và thời điểm hoạt động
+Nghiệp vụ;Quản trị viên;Môn học (Subject);Tạo, xem và cập nhật môn học
+Nghiệp vụ;Quản trị viên;Câu hỏi (Question);Quản lý ngân hàng câu hỏi
+Nghiệp vụ;Quản trị viên;Đề thi (Exam);Tạo, xem, sửa và xóa đề thi
+Nghiệp vụ;Quản trị viên;Câu hỏi trong đề (ExamQuestion);Gắn/gỡ câu hỏi khỏi đề thi
+Nghiệp vụ;Quản trị viên;Phòng thi (Room);Tạo, sửa, xóa, mở/đóng và giám sát phòng
+Nghiệp vụ;Quản trị viên;Người tham gia phòng (RoomParticipant);Xem danh sách và trạng thái người tham gia
+Nghiệp vụ;Quản trị viên;Lượt thi (Attempt);Xem, tìm kiếm/lọc kết quả và chi tiết bài thi
+Nghiệp vụ;Quản trị viên;Câu trả lời (AttemptAnswer);Xem chi tiết đáp án của lượt thi
+Nghiệp vụ;Quản trị viên;Thống kê;Xem thống kê tổng quan và thống kê theo đề (tổng hợp từ dữ liệu nghiệp vụ)
+Hệ thống;Máy chủ (Server);Tài khoản, môn học, câu hỏi, đề thi, phòng thi, lượt thi và câu trả lời;Xử lý yêu cầu nghiệp vụ và đọc/ghi dữ liệu
+Hệ thống;Quản trị hệ thống;Cơ sở dữ liệu (SQLite);Khởi tạo bảng, chỉ mục và dữ liệu mẫu
+Hệ thống;Client;Dữ liệu giao diện/yêu cầu;Gửi thao tác và hiển thị phản hồi cho sinh viên hoặc quản trị viên; không phải đối tượng nghiệp vụ lưu trữ
+Ghi chú;;Sinh viên và Quản trị viên;Là các vai trò của Tài khoản (User), không nhất thiết là hai loại tài khoản riêng
+Ghi chú;;Kết quả thi và Thống kê;Có thể tính từ Lượt thi và Câu trả lời, không bắt buộc lưu thành bảng riêng
